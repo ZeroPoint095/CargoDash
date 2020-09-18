@@ -1,5 +1,6 @@
 MAX_SPEED = 3
 
+
 class Vehicle:
     def __init__(self, steering_wheel):
         assert isinstance(steering_wheel, SteeringWheel)
@@ -55,11 +56,13 @@ class Throttle:
 
 class Brake:
     def __init__(self):
-        #inheret from wheel?
+        # Inherent from wheel?
         pass
-    
+  
     def brake(self, force_percent):
-        #brake with a certain amount of force, eg 10% for gradual decrease in speed, 90% for emergency stop (probably blocking the wheels)
+        # Brake with a certain amount of force, eg 10% for gradual
+        # decrease in speed, 90% for emergency stop
+        # (probably blocking the wheels).
         pass
 
 
@@ -70,11 +73,10 @@ class EmergencyStop:
 
 class Sensor:
     def __init__(self, sensor_type, value_type):
-        #sensor type is eg speed, force, distance, temperature, etc
-        #value type is eg int, float, vector, analog signal
+        # Sensor type is eg speed, force, distance, temperature, etc.
+        # Value type is eg int, float, vector, analog signal.
         self.sensor_type = sensor_type
         self.value_type = value_type
-        pass
 
     def read_sensor():
         sensor_value = None

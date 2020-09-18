@@ -7,7 +7,7 @@ class Vehicle:
         self.steering_wheel = steering_wheel
 
 
-class AutoBus(Vehicle):
+class Coach(Vehicle):
     def __init__(self, engine, steering_wheel):
         assert isinstance(engine, Engine)
         self.engine = engine
@@ -84,4 +84,4 @@ class Sensor:
 
 
 Vehicle(SteeringWheel(90))
-AutoBus(Engine(), SteeringWheel(90))
+Coach(Engine(), SteeringWheel(90))

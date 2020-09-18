@@ -27,7 +27,7 @@ class Wheel:
     def __init__(self, diameter):
         self.diameter = diameter
         self.speed = 0
-    
+
     def get_speed(self):
         return read_speed_sensor()
 
@@ -58,7 +58,7 @@ class Brake:
     def __init__(self):
         # Inherent from wheel?
         pass
-  
+
     def brake(self, force_percent):
         # Brake with a certain amount of force, eg 10% for gradual
         # decrease in speed, 90% for emergency stop

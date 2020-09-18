@@ -22,11 +22,13 @@ class Tire:
 
 class Wheel:
     def __init__(self, diameter):
+        assert isinstance(diameter, float)
         self.diameter = diameter
 
 
 class SteeringWheel:
     def __init__(self, steering_radius):
+        assert isinstance(steering_radius, float)
         self.steering_radius = steering_radius
 
 

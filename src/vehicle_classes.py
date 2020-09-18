@@ -18,11 +18,6 @@ class Coach(Vehicle):
         Vehicle.__init__(self, steering_wheel)
 
 
-class Tire:
-    def __init__(self):
-        pass
-
-
 class Wheel:
     def __init__(self, diameter):
         self.diameter = diameter
@@ -39,18 +34,39 @@ class Wheel:
             self.speed = MAX_SPEED
 
 
+class Tire(Wheel):
+    def __init__(self):
+        pass
+
+
 class SteeringWheel:
     def __init__(self, steering_radius):
-        self.steering_radius = steering_radius
+        self.current_steering_radius = steering_radius
+
+    def change_radius():
+        # Changes the current steering radius.
+        pass
 
 
 class Engine:
     def __init__(self):
         pass
 
+    def turn_on(self):
+        # Turns engine on.
+        pass
+
+    def turn_off(self):
+        # Turns engine off.
+        pass
+
 
 class Throttle:
     def __init__(self):
+        pass
+
+    def throttle_activated(self, force_percent):
+        # Throttles with a certain amount of force.
         pass
 
 
@@ -59,7 +75,7 @@ class Brake:
         # Inherent from wheel?
         pass
 
-    def brake(self, force_percent):
+    def brake_activated(self, force_percent):
         # Brake with a certain amount of force, eg 10% for gradual
         # decrease in speed, 90% for emergency stop
         # (probably blocking the wheels).
@@ -68,6 +84,10 @@ class Brake:
 
 class EmergencyStop:
     def __init__(self):
+        pass
+
+    def stop_activated():
+        # Stop movement/steering
         pass
 
 

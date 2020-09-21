@@ -1,4 +1,14 @@
+from enum import Enum
+
+
 MAX_SPEED = 3
+
+
+class WheelPosition(Enum):
+    front_left = 0
+    front_right = 1
+    rear_left = 2
+    rear_right = 3
 
 
 class Vehicle:
@@ -11,16 +21,14 @@ class Coach(Vehicle):
     def __init__(self, engine, steering_wheel):
         assert isinstance(engine, Engine)
         self.engine = engine
-        self.fl_wheel = Wheel(27)
-        self.fr_wheel = Wheel(27)
-        self.rl_wheel = Wheel(27)
-        self.rr_wheel = Wheel(27)
+        self.wheels = [Wheel(27, wheel_position) for wheel_position in range(4)]
         Vehicle.__init__(self, steering_wheel)
 
 
 class Wheel:
-    def __init__(self, diameter):
+    def __init__(self, diameter, wheel_position):
         self.diameter = diameter
+        self.wheel_position = wheel_position
         self.speed = 0
 
     def get_speed(self):

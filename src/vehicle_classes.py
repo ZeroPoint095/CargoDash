@@ -21,7 +21,7 @@ class Coach(Vehicle):
     def __init__(self, engine, steering_wheel):
         assert isinstance(engine, Engine)
         self.engine = engine
-        self.wheels = [Wheel(27, wheel_position) for wheel_position in range(4)]
+        self.wheels = [Wheel(27, wheel_position, 100) for wheel_position in range(4)]
         self.throttle = Throttle()
         self.brake = Brake()
         self.emergency_stop = EmergencyStop()

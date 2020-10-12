@@ -22,12 +22,16 @@ class Coach(Vehicle):
         assert isinstance(engine, Engine)
         self.engine = engine
         self.wheels = [Wheel(27, wheel_position) for wheel_position in range(4)]
+        self.throttle = Throttle()
+        self.brake = Brake()
+        self.emergency_stop = EmergencyStop()
         Vehicle.__init__(self, steering_wheel)
 
 
 class Wheel:
-    def __init__(self, diameter, wheel_position):
-        self.diameter = diameter
+    def __init__(self, wheel_diameter, wheel_position, suspension_stiffness):
+        self.tire = Tire(wheel_diameter)
+        self.suspension = Suspension(suspension_stiffness)
         self.wheel_position = wheel_position
         self.speed = 0
 
@@ -42,16 +46,21 @@ class Wheel:
             self.speed = MAX_SPEED
 
 
-class Tire(Wheel):
-    def __init__(self):
-        pass
+class Tire:
+    def __init__(self, wheel_diameter):
+        self.wheel_diameter = wheel_diameter
+
+
+class Suspension:
+    def __init__(self, stiffness):
+        self.stiffness = stiffness
 
 
 class SteeringWheel:
     def __init__(self, steering_radius):
         self.current_steering_radius = steering_radius
 
-    def change_radius():
+    def change_radius(steering_radius):
         # Changes the current steering radius.
         pass
 
@@ -97,18 +106,6 @@ class EmergencyStop:
     def stop_activated():
         # Stop movement/steering
         pass
-
-
-class Sensor:
-    def __init__(self, sensor_type, value_type):
-        # Sensor type is eg speed, force, distance, temperature, etc.
-        # Value type is eg int, float, vector, analog signal.
-        self.sensor_type = sensor_type
-        self.value_type = value_type
-
-    def read_sensor():
-        sensor_value = None
-        return sensor_value
 
 
 Vehicle(SteeringWheel(90))

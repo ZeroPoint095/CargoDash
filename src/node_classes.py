@@ -1,6 +1,12 @@
 class Node:
-    def __init__(self):
-        pass
+    def __init__(self, node_type, value_type):
+        # Node type is eg speed, force, distance, temperature, etc.
+        # Value type is eg int, float, vector, analog signal.
+        self.node_type = node_type
+        self.value_type = value_type
+
+    def read_sensor():
+        return sensor_value
 
 
 class DistanceNode(Node):

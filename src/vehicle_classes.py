@@ -42,7 +42,7 @@ class Vehicle(ABC):
         average_speed = 0
         for wheel in self.wheels:
             average_speed += wheel.speed
-        return average_speed / len(self.wheels)
+        return float(average_speed / len(self.wheels))
 
 
 class Coach(Vehicle):

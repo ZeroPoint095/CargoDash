@@ -1,5 +1,5 @@
 from enum import Enum
-from abc import ABC, abstractmethod
+from abc import ABC
 
 MAX_SPEED = 3
 
@@ -38,6 +38,12 @@ class Vehicle(ABC):
         self.steering_wheel = steering_wheel
         super().__init__()
 
+    def get_speed(self):
+        average_speed = 0
+        for wheel in self.wheels:
+            average_speed += wheel.speed
+        return average_speed / len(self.wheels)
+
 
 class Coach(Vehicle):
     def __init__(self, engine: Engine, steering_wheel: SteeringWheel):
@@ -48,12 +54,6 @@ class Coach(Vehicle):
         self.brake = Brake()
         self.emergency_stop = EmergencyStop()
         Vehicle.__init__(self, steering_wheel)
-
-    def get_speed(self):
-        average_speed = 0
-        for wheel in self.wheels:
-            average_speed += wheel.speed
-        return average_speed / len(self.wheels)
 
 
 class Wheel:

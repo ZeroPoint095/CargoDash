@@ -15,22 +15,22 @@ class SteeringWheel:
     def __init__(self, steering_radius: float):
         self.current_steering_radius = steering_radius
 
-    def change_radius(steering_radius: float):
+    def change_radius(self, steering_radius: float):
         # Changes the current steering radius.
-        pass
+        self.current_steering_radius = steering_radius
 
 
 class Engine:
     def __init__(self):
-        pass
+        self.engine_running = False
 
     def turn_on(self):
         # Turns engine on.
-        pass
+        self.engine_running = True
 
     def turn_off(self):
         # Turns engine off.
-        pass
+        self.engine_running = False
 
 
 class Vehicle(ABC):
@@ -42,17 +42,24 @@ class Vehicle(ABC):
 class Coach(Vehicle):
     def __init__(self, engine: Engine, steering_wheel: SteeringWheel):
         self.engine = engine
-        self.wheels = [Wheel(27, wheel_position, 100) for wheel_position in range(4)]
+        self.wheels = [Wheel(27, wheel_position, 100, 2.1)
+                       for wheel_position in range(4)]
         self.throttle = Throttle()
         self.brake = Brake()
         self.emergency_stop = EmergencyStop()
         Vehicle.__init__(self, steering_wheel)
 
+    def get_speed(self):
+        average_speed = 0
+        for wheel in self.wheels:
+            average_speed += wheel.speed
+        return average_speed / len(self.wheels)
+
 
 class Wheel:
     def __init__(self, wheel_diameter: float, wheel_position: int,
-                 suspension_stiffness: float):
-        self.tire = Tire(wheel_diameter)
+                 suspension_stiffness: float, tire_pressure: float):
+        self.tire = Tire(wheel_diameter, tire_pressure)
         self.suspension = Suspension(suspension_stiffness)
         self.wheel_position = wheel_position
         self.speed = 0
@@ -64,19 +71,20 @@ class Wheel:
         if new_speed <= MAX_SPEED:
             self.speed = new_speed
         else:
-            print(new_speed, " exceeds max speed of ", MAX_SPEED, ". \n Speed set to ", MAX_SPEED)
+            print(new_speed, " exceeds max speed of ",
+                  MAX_SPEED, ". \n Speed set to ", MAX_SPEED)
             self.speed = MAX_SPEED
 
 
 class Tire:
-    def __init__(self, wheel_diameter: float):
+    def __init__(self, wheel_diameter: float, tire_pressure: float):
         self.wheel_diameter = wheel_diameter
+        self.tire_pressure = tire_pressure
 
 
 class Suspension:
     def __init__(self, stiffness: float):
         self.stiffness = stiffness
-
 
 
 class Throttle:

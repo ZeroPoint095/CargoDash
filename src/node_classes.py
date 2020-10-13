@@ -6,10 +6,11 @@ class Node:
         self.value_type = value_type
 
     def read_sensor():
-        return sensor_value
+        pass
 
 
 class DistanceNode(Node):
+    # Distance as object distance
     def __init__(self, distance):
         self.distance = distance
         Node.__init__(self)
@@ -22,5 +23,18 @@ class SteeringNode(Node):
 
 
 class CoordinationNode(Node):
-    def __init__(self):
+    def __init__(self, location):
+        self.location = location
+        Node.__init__(self)
+
+
+class EngineNode(Node):
+    def __init__(self, set_engine):
+        self.set_engine = set_engine
+        Node.__init__(self)
+
+
+class TemperatureNode(Node):
+    def __init__(self, temperature):
+        self.temperature = temperature
         Node.__init__(self)

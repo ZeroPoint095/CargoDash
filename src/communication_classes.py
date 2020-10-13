@@ -1,4 +1,9 @@
-class CommunicationProtocol:
+''' Not sure if we are able to use this but we can leave it for now  '''
+
+from abc import ABC
+
+
+class CommunicationProtocol(ABC):
     def __init__(self):
         pass
 

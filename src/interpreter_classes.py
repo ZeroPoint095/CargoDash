@@ -22,6 +22,6 @@ class Interpreter(ABC):
         pass
 
 
-class CanOpenInterpreter(ABC):
+class CanOpenInterpreter(Interpreter):
     def __init__(self):
         super().__init__()

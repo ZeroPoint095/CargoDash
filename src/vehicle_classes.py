@@ -11,7 +11,7 @@ class WheelPosition(Enum):
     rear_right = 3
 
 
-class SteeringWheel:
+class Steering:
     def __init__(self, steering_radius: float):
         self.current_steering_radius = steering_radius
 
@@ -34,8 +34,8 @@ class Engine:
 
 
 class Vehicle(ABC):
-    def __init__(self, steering_wheel: SteeringWheel):
-        self.steering_wheel = steering_wheel
+    def __init__(self, steering: Steering):
+        self.steering = steering
         super().__init__()
 
     def get_speed(self):
@@ -46,14 +46,14 @@ class Vehicle(ABC):
 
 
 class Coach(Vehicle):
-    def __init__(self, engine: Engine, steering_wheel: SteeringWheel):
+    def __init__(self, engine: Engine, steering: Steering):
         self.engine = engine
         self.wheels = [Wheel(27, wheel_position, 100, 2.1)
                        for wheel_position in range(4)]
         self.throttle = Throttle()
         self.brake = Brake()
         self.emergency_stop = EmergencyStop()
-        Vehicle.__init__(self, steering_wheel)
+        Vehicle.__init__(self, steering)
 
 
 class Wheel:
@@ -117,5 +117,5 @@ class EmergencyStop:
         pass
 
 
-Vehicle(SteeringWheel(90))
-Coach(Engine(), SteeringWheel(90))
+Vehicle(Steering(90))
+Coach(Engine(), Steering(90))

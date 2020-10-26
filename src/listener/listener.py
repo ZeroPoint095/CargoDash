@@ -6,18 +6,13 @@ class Listener(ABC):
         super().__init__()
 
     @abstractmethod
-    def listenToChannel():
+    def listenToNetwork(self, channel):
         pass
 
     @abstractmethod
-    def log_data():
+    def inform_interpreter(self):
+        pass
+    
+    def log_data(self):
         pass
 
-    @abstractmethod
-    def inform_interpreter():
-        pass
-
-
-class CanOpenListener(Listener):
-    def __init__(self):
-        super().__init__()

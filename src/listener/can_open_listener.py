@@ -7,11 +7,12 @@ from listener import Listener
 
 class CanOpenListener(Listener):
     def __init__(self):
-        self._load_configuration()
-        self.listenToNetwork(canopen.Network())
         super().__init__()
+        self._load_configuration()
+        self.connectToNetwork(canopen.Network())
+        self.listenToNetwork()
 
-    def listenToNetwork(self, network):
+    def connectToNetwork(self, network):
         self.network = network
         try:
             self.network.connect(bustype=self.cfg['canopen']['bustype'],
@@ -19,6 +20,11 @@ class CanOpenListener(Listener):
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
                           ' please check if configuration is setted properly!')
+
+    def listenToNetwork(self):
+        for msg in self.network.bus:
+            self.log_data(str(msg) + '\n')
+            print(msg.data)
 
     def inform_interpreter(self):
         pass

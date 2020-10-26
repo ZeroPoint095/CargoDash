@@ -3,8 +3,9 @@ from abc import ABC, abstractmethod
 
 
 class Listener(ABC):
-    def __init__(self):
-        self.directory = '../logs/'
+    def __init__(self, config):
+        self.config = config
+        self.directory = './logs/'
         self.log_file = datetime.now().strftime('%d-%m-%Y-%H:%M:%S') + '.log'
         super().__init__()
 

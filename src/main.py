@@ -5,4 +5,4 @@ if __name__ == "__main__":
     # Standard python main structure
     with open('./config.yaml', 'r') as ymlfile:
         config = yaml.safe_load(ymlfile)
-    CanOpenListener(config)
+    masterNode = CanOpenListener(config, True, [1])

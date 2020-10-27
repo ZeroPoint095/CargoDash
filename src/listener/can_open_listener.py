@@ -1,17 +1,15 @@
 import canopen
 import logging
-from time import sleep
 
 from listener.listener import Listener
 
 
 class CanOpenListener(Listener):
-    def __init__(self, config, master, nodes):
+    def __init__(self, config, nodes):
         super().__init__(config)
         self.connectToNetwork(canopen.Network())
         self.addNodes(nodes)
-        if(master):
-            self.listenToNetwork()
+        self.listenToNetwork()
 
     def connectToNetwork(self, network):
         self.network = network
@@ -37,9 +35,8 @@ class CanOpenListener(Listener):
             self.network[node_id].sdo.upload(0x2000, 0)
             number = self.network[node_id].sdo[0x2000].phys
             print(bytes([number, 0]))
-            self.network[node_id].sdo.download(0x2000, 0, bytes([number + 1, 0]))
-            
-            
+            self.network[node_id].sdo.download(0x2000, 0,
+                                               bytes([number + 1, 0]))
 
     def inform_interpreter(self):
         pass

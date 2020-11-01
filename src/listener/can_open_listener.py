@@ -3,7 +3,6 @@ import logging
 
 from listener.listener import Listener
 
-
 class CanOpenListener(Listener):
     def __init__(self, config, nodes):
         super().__init__(config)
@@ -22,13 +21,8 @@ class CanOpenListener(Listener):
 
     def addNodes(self, nodes):
         for i in range(len(nodes)):
-            od = canopen.ObjectDictionary()
-            variable = canopen.objectdictionary.Variable(
-                       'Measuring distance', 0x2000)
-            variable.data_type = canopen.objectdictionary.UNSIGNED16
-            variable.access_type = 'rw'
-            od.add_object(variable)
-            self.network.add_node(i + 1, od)
+            # remote node
+            self.network.add_node(i + 1, 'eds_files/measuring_distance_node.eds')
 
     def listenToNetwork(self):
         for node_id in self.network:

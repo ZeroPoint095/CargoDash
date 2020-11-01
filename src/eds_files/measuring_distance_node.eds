@@ -1,0 +1,6 @@
+[2000]
+ParameterName=Distance
+ObjectType=0x7
+DataType=0x0006
+AccessType=rw
+DefaultValue=0x0

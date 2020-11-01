@@ -10,11 +10,11 @@ class Listener(ABC):
         super().__init__()
 
     @abstractmethod
-    def connectToNetwork(self, channel):
+    def connect_to_network(self, channel):
         pass
 
     @abstractmethod
-    def listenToNetwork(self):
+    def listen_to_network(self):
         pass
 
     @abstractmethod

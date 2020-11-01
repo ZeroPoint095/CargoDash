@@ -14,7 +14,8 @@ class MeasuringSlaveNode:
         while True:
             sleep(1)
             print(self.network[1].sdo[0x2000].phys)
-            self.network.sync.transmit()            
+            self.network[1].sdo.download(0x2000, 0, bytes([self.network[1].sdo[0x2000].phys + 1, 0]))
+            self.network.sync.transmit()
 
     def connectToNetwork(self, network):
         self.network = network

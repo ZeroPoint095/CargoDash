@@ -2,3 +2,4 @@ canopen:
     bustype: socketcan
     channel: vcan0
     bitrate: 250000
+    nodes: [{local: false, eds_location: 'eds_files/measuring_distance_node.eds'}]

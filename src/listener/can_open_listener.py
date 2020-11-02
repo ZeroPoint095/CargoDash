@@ -40,7 +40,8 @@ class CanOpenListener(Listener):
         network = canopen.Network()
         try:
             network.connect(bustype=self.config['canopen']['bustype'],
-                            channel=self.config['canopen']['channel'])
+                            channel=self.config['canopen']['channel'],
+                            bitrate=self.config['canopen']['bitrate'])
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
                           ' please check if configuration is setted properly!')

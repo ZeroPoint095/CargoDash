@@ -1,5 +1,11 @@
-canopen:
+canopen_vcan:
     bustype: socketcan
     channel: vcan0
     bitrate: 250000
     nodes: [{local: false, eds_location: 'eds_files/measuring_distance_node.eds'}]
+
+canopen_serial:
+    bustype: slcan
+    channel: /dev/ttyACM0
+    bitrate: None
+    #TODO: whatever needs to be in "nodes" field

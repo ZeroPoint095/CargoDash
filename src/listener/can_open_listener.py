@@ -4,7 +4,6 @@ from threading import Thread
 
 from listener.listener import Listener
 from canopen.sdo.exceptions import SdoCommunicationError
-from time import strftime, localtime
 
 
 class CanOpenListener(Listener):

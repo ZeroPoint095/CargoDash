@@ -10,7 +10,7 @@ class CanOpenListener(Listener):
     ''' This class is being used to listen on a network and mainly
         tries to push the changes around other nodes to it's interpreter.
     '''
-    def __init__(self, config, interpreter=None):
+    def __init__(self, config, config_type='canopen_vcan', interpreter=None):
         ''' config : yaml_file_stream
                 The configured yaml file that contains details for the
                 connection type.
@@ -19,10 +19,11 @@ class CanOpenListener(Listener):
         '''
         super().__init__(config)
         self.observers = []
+        self.config_type = config_type
         self.network = self.connect_to_network()
-        self._add_nodes(self.config['canopen']['nodes'])
+        self._add_nodes(self.config[self.config_type]['nodes'])
         self.interpreter = interpreter
-        if(self.config['canopen']['raw_can_data_logging']):
+        if(self.config[self.config_type]['raw_can_data_logging']):
             # Creates new network connection because CANopen library has
             # difficulties with multthreading on a single network connection.
             self.raw_log_network = self.connect_to_network()
@@ -38,9 +39,9 @@ class CanOpenListener(Listener):
 
         network = canopen.Network()
         try:
-            network.connect(bustype=self.config['canopen']['bustype'],
-                            channel=self.config['canopen']['channel'],
-                            bitrate=self.config['canopen']['bitrate'])
+            network.connect(bustype=self.config[self.config_type]['bustype'],
+                            channel=self.config[self.config_type]['channel'],
+                            bitrate=self.config[self.config_type]['bitrate'])
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
                           ' please check if configuration is setted properly!')

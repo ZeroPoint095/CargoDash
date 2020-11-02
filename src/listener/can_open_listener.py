@@ -61,8 +61,16 @@ class CanOpenListener(Listener):
                     logging.error(f'The requested sdo ({hex(sdo_index)})'
                                   ' is not received')
 
-    def inform_interpreter(self, can_id):
-        print(can_id)
+    def inform_interpreter(self, sdo_object):
+        ''' Informs the interpreter with a changed SDO.
+
+            sdo_object : canopen.sdo.Variable
+                Sends out the changed SDO.
+        
+            Returns void.
+        '''
+
+        self.interpreter.inform_interpreter(sdo_object)
 
     def set_interpreter(self, interpreter):
         ''' Set the interpreter where CanOpenListener can send messages to.

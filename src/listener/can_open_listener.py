@@ -39,12 +39,15 @@ class CanOpenListener(Listener):
 
         network = canopen.Network()
         try:
-            network.connect(bustype=self.config[self.config_type]['bustype'],
-                            channel=self.config[self.config_type]['channel'],
-                            bitrate=self.config[self.config_type]['bitrate'])
+            bustype = self.config[self.config_type]['bustype']
+            channel = self.config[self.config_type]['channel']
+            bitrate = self.config[self.config_type]['bitrate']
+            network.connect(bustype=bustype, channel=channel, bitrate=bitrate)
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
-                          ' please check if configuration is setted properly!')
+                          ' please check if configuration is setted properly!'
+                          f'(bustype = {bustype}, channel = {channel},'
+                          f' bitrate = {bitrate})')
         return network
 
     def listen_to_network(self):

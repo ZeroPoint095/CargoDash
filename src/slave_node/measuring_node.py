@@ -3,6 +3,10 @@ import logging
 import yaml
 from time import sleep
 
+'''
+    We are not going to use this for the project but can be
+    used for testing purposes.
+'''
 
 class MeasuringSlaveNode:
     def __init__(self):
@@ -21,10 +25,11 @@ class MeasuringSlaveNode:
         self.network = network
         try:
             self.network.connect(bustype=self.config['canopen']['bustype'],
-                                 channel=self.config['canopen']['channel'])
+                                 channel=self.config['canopen']['channel'],
+                                 bitrate=self.config['canopen']['bitrate'])
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
                           ' please check if configuration is setted properly!')
 
 
-MeasuringSlaveNode() 
+MeasuringSlaveNode()

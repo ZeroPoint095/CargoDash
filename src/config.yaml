@@ -1,8 +1,7 @@
 canopen_vcan:
     bustype: socketcan
     channel: vcan0
-<<<<<<< HEAD
-    bitrate: 250000
+    bitrate: 500000
     nodes: [{local: false, eds_location: 'eds_files/measuring_distance_node.eds'}]
 
 canopen_serial:
@@ -10,8 +9,3 @@ canopen_serial:
     channel: /dev/ttyACM0
     bitrate: None
     #TODO: whatever needs to be in "nodes" field
-=======
-    bitrate: 500000
-    nodes: [{local: false, eds_location: 'eds_files/measuring_distance_node.eds'}]
-    raw_can_data_logging: true
->>>>>>> 52c721839110ead370a0c07cc783d27d08118acb

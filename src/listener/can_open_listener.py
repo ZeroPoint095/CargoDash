@@ -52,7 +52,7 @@ class CanOpenListener(Listener):
                 # And then get each variable's index and read it
                 sdo_index = sdo_object.od.index
                 try:
-                    # TODO: Only allows simple variables for now, 
+                    # TODO: Only allows simple variables for now,
                     #        needs to be able process complex variables.
                     sdo_value = self.network[node_id].sdo.upload(
                                 sdo_index, 0)
@@ -67,7 +67,7 @@ class CanOpenListener(Listener):
 
             sdo_object : canopen.sdo.Variable
                 Sends out the changed SDO.
-        
+
             Returns void.
         '''
 

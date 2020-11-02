@@ -27,4 +27,5 @@ class MeasuringSlaveNode:
                           ' please check if configuration is setted properly!')
 
 
-MeasuringSlaveNode() 
+MeasuringSlaveNode()
+ 

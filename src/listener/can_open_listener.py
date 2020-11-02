@@ -1,8 +1,10 @@
 import canopen
 import logging
+from threading import Thread
 
 from listener.listener import Listener
 from canopen.sdo.exceptions import SdoCommunicationError
+from time import strftime, localtime
 
 
 class CanOpenListener(Listener):
@@ -18,25 +20,31 @@ class CanOpenListener(Listener):
         '''
         super().__init__(config)
         self.observers = []
-        self.connect_to_network()
+        self.network = self.connect_to_network()
         self._add_nodes(self.config['canopen']['nodes'])
         self.interpreter = interpreter
+        if(self.config['canopen']['raw_can_data_logging']):
+            # Creates new network connection because CANopen library has
+            # difficulties with multthreading on a single network connection.
+            self.raw_log_network = self.connect_to_network()
+            Thread(target=self._log_raw_data).start()
 
     def connect_to_network(self):
         ''' Connects to a can network.
             This method is depending on config.yaml, please
             configure the yaml file correctly before using this method.
 
-            Returns void.
+            Returns canopen.Network.
         '''
 
-        self.network = canopen.Network()
+        network = canopen.Network()
         try:
-            self.network.connect(bustype=self.config['canopen']['bustype'],
-                                 channel=self.config['canopen']['channel'])
+            network.connect(bustype=self.config['canopen']['bustype'],
+                            channel=self.config['canopen']['channel'])
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
                           ' please check if configuration is setted properly!')
+        return network
 
     def listen_to_network(self):
         ''' Listens to connected network and tries to find any value changes.
@@ -108,3 +116,7 @@ class CanOpenListener(Listener):
             self.observers.append({'index': sdo_index, 'value': sdo_value})
             changed = True
         return changed
+
+    def _log_raw_data(self):
+        for raw_msg in self.raw_log_network.bus:
+            self.log_data(str(raw_msg))

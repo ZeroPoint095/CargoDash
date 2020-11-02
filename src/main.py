@@ -12,5 +12,5 @@ if __name__ == "__main__":
 
     # main loop
     while True:
-        sleep(0.1)
         master_node.listen_to_network()
+        sleep(0.1)

@@ -28,4 +28,3 @@ class MeasuringSlaveNode:
 
 
 MeasuringSlaveNode()
- 

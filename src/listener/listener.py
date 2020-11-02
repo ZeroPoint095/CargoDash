@@ -24,4 +24,5 @@ class Listener(ABC):
     def log_data(self, message):
         log_file_location = self.directory + self.log_file
         with open(log_file_location, 'a') as file:
-            file.write(message)
+            file.write(message + '\n')
+        file.close()

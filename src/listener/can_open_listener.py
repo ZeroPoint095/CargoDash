@@ -64,12 +64,16 @@ class CanOpenListener(Listener):
                 # And then get each variable's index and read it
                 sdo_index = sdo_object.od.index
                 try:
-                    # TODO: Only allows simple variables for now,
-                    #        needs to be able process complex variables.
-                    sdo_value = self.network[node_id].sdo.upload(
-                                sdo_index, 0)
-                    if(self._sdo_value_changed(sdo_index, sdo_value)):
-                        self.inform_interpreter(sdo_index)
+                    # Check for indices between 0x1000 and 0x5FFF
+                    # Because we except communication between those
+                    if (sdo_index > 0x1000 and sdo_index < 0x5FFF):
+                        if (type(sdo_object) == canopen.sdo.base.Array
+                                or type(sdo_object) == canopen.sdo.base.Record):
+                            self._check_complex_variable(
+                                self.network[node_id].sdo, sdo_index)
+                        elif (type(sdo_object) == canopen.sdo.base.Variable):
+                            self._check_simple_variable(
+                                self.network[node_id].sdo, sdo_index)
                 except SdoCommunicationError:
                     logging.error(f'The requested sdo ({hex(sdo_index)})'
                                   ' is not received')
@@ -96,10 +100,25 @@ class CanOpenListener(Listener):
 
         self.interpreter = interpreter
 
+    def _check_complex_variable(self, node_sdo, index):
+        for subindex in node_sdo[index]:
+            # Skips subindex 0 because there are no value changes around this
+            if(subindex != 0):
+                index_and_subindex = f'{index}sub{subindex}'
+                sdo_value = node_sdo.upload(index, subindex)
+                # Checks for every subindex if value changed
+                if(self._sdo_value_changed(index_and_subindex, sdo_value)):
+                    self.inform_interpreter(index_and_subindex)
+
+    def _check_simple_variable(self, node_sdo, index):
+        sdo_value = node_sdo.upload(index, 0)
+        if(self._sdo_value_changed(index, sdo_value)):
+            self.inform_interpreter(index)
+
     def _add_nodes(self, nodes):
         for i in range(len(nodes)):
             # Either adds local or remote node bases on config for each node
-            if (nodes[i]['local']):
+            if(nodes[i]['local']):
                 self.network.create_node(i + 1, nodes[i]['eds_location'])
             else:
                 self.network.add_node(i + 1, nodes[i]['eds_location'])
@@ -113,10 +132,10 @@ class CanOpenListener(Listener):
         for observer in self.observers:
             if(observer['index'] == sdo_index):
                 found = True
-                if (observer['value'] != sdo_value):
+                if(observer['value'] != sdo_value):
                     observer['value'] = sdo_value
                     changed = True
-        if (not found):
+        if(not found):
             self.observers.append({'index': sdo_index, 'value': sdo_value})
             changed = True
         return changed

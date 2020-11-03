@@ -8,6 +8,9 @@ from time import sleep
     used for testing purposes.
 '''
 
+INTERFACE = 'canopen_vcan'
+# INTERFACE = 'canopen_slcan'
+
 
 class MeasuringSlaveNode:
     def __init__(self):
@@ -26,12 +29,12 @@ class MeasuringSlaveNode:
     def connectToNetwork(self, network):
         self.network = network
         try:
-            self.network.connect(bustype=self.config['canopen_vcan']['bustype'],
-                                 channel=self.config['canopen_vcan']['channel'],
-                                 bitrate=self.config['canopen_vcan']['bitrate'])
+            self.network.connect(bustype=self.config[INTERFACE]['bustype'],
+                                 channel=self.config[INTERFACE]['channel'],
+                                 bitrate=self.config[INTERFACE]['bitrate'])
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
-                          ' please check if configuration is setted properly!')
+                          ' please check if configuration is set properly!')
 
 
 MeasuringSlaveNode()

@@ -45,7 +45,7 @@ class CanOpenListener(Listener):
             network.connect(bustype=bustype, channel=channel, bitrate=bitrate)
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
-                          ' please check if configuration is setted properly!'
+                          ' please check if configuration is set properly!'
                           f'(bustype = {bustype}, channel = {channel},'
                           f' bitrate = {bitrate})')
         return network

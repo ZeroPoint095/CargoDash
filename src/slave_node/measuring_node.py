@@ -29,12 +29,15 @@ class MeasuringSlaveNode:
     def connectToNetwork(self, network):
         self.network = network
         try:
-            self.network.connect(bustype=self.config[INTERFACE]['bustype'],
-                                 channel=self.config[INTERFACE]['channel'],
-                                 bitrate=self.config[INTERFACE]['bitrate'])
+            bustype = self.config[INTERFACE]['bustype']
+            channel = self.config[INTERFACE]['channel']
+            bitrate = self.config[INTERFACE]['bitrate']
+            network.connect(bustype=bustype, channel=channel, bitrate=bitrate)
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'
-                          ' please check if configuration is set properly!')
+                          ' please check if configuration is set properly!'
+                          f'(bustype = {bustype}, channel = {channel},'
+                          f' bitrate = {bitrate})')
 
 
 MeasuringSlaveNode()

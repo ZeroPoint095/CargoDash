@@ -8,3 +8,6 @@ class CanOpenInterpreter(Interpreter):
     def inform_interpreter(self, sdo_object):
         # Work in progress
         print(sdo_object)
+    
+    def interpret_object(self):
+        pass

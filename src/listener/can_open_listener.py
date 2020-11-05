@@ -69,10 +69,10 @@ class CanOpenListener(Listener):
                     if (sdo_index > 0x1000 and sdo_index < 0x5FFF):
                         if (type(sdo_object) == canopen.sdo.base.Array
                                 or type(sdo_object) == canopen.sdo.base.Record):
-                            self._check_complex_variable(
+                            self._read_complex_variable(
                                 self.network[node_id].sdo, sdo_index)
                         elif (type(sdo_object) == canopen.sdo.base.Variable):
-                            self._check_simple_variable(
+                            self._read_simple_variable(
                                 self.network[node_id].sdo, sdo_index)
                 except SdoCommunicationError:
                     logging.error(f'The requested sdo ({hex(sdo_index)})'
@@ -100,7 +100,7 @@ class CanOpenListener(Listener):
 
         self.interpreter = interpreter
 
-    def _check_complex_variable(self, node_sdo, index):
+    def _read_complex_variable(self, node_sdo, index):
         for subindex in node_sdo[index]:
             # Skips subindex 0 because there are no value changes around this
             if(subindex != 0):
@@ -110,7 +110,7 @@ class CanOpenListener(Listener):
                 if(self._sdo_value_changed(index_and_subindex, sdo_value)):
                     self.inform_interpreter(index_and_subindex)
 
-    def _check_simple_variable(self, node_sdo, index):
+    def _read_simple_variable(self, node_sdo, index):
         sdo_value = node_sdo.upload(index, 0)
         if(self._sdo_value_changed(index, sdo_value)):
             self.inform_interpreter(index)

@@ -3,16 +3,36 @@ from abc import ABC
 
 class NodeInput(ABC):
     def __init__(self, value, name, node_purpose):
-        # Value is eg int, float, vector, analog signal.
+        ''' NodeInput Object used to change to state of the vehicle.
+
+            value : any
+                Node value to change the state of the vehicle.
+
+            name : string
+                Name given with the value.
+
+            node_purpose : string
+                Description what the node is functioning for.
+
+        '''
         self.name = name
         self.value = value
         self.node_purpose = node_purpose
         super().__init__()
 
     def read_node_input(self):
+        ''' Returns the value of the node input object.
+        '''
         return self.value
 
     def write_node_input(self, new_value):
+        ''' Changes the value of the node input object.
+
+            new_value : void
+                The new value for the node input object.
+
+            Returns void.
+        '''
         self.value = new_value
 
 
@@ -21,7 +41,6 @@ class DistanceNodeInput(NodeInput):
     # Distance as object distance
     def __init__(self, distance: float, name: str, node_purpose: str):
         super().__init__(distance, name, node_purpose)
-        print(self.value)
 
 
 class SteeringNodeInput(NodeInput):

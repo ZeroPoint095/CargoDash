@@ -8,25 +8,28 @@ class CanOpenInterpreter(Interpreter):
         self.node_input_factory = NodeInputFactory()
         super().__init__()
 
-    def inform_interpreter(self, sdo_value, sdo_object, node_purpose):
+    def inform_interpreter(self, sdo_value, sdo_name, node_purpose):
         ''' This method is requested by the CanOpenListener when it notices
             changes at a certain sdo value.
 
             sdo_value: any
                 Value to change the state of the vehicle.
 
-            sdo_object: canopen.sdo.Variable
-                The SDO with the changed value.
+            sdo_object: string
+                The name of the SDO.
 
             node_purpose: dictionary {name: string, type: integer}
                 A dictionary that contains a name/description about the node
                 and the type of the node.
+
+            Returns void.
         '''
-        self._interpret_object(sdo_value, sdo_object.od.name,
+        self._interpret_object(sdo_value, sdo_name,
                                node_purpose['name'], node_purpose['type'])
 
     def _interpret_object(self, value, name, node_name, node_type):
         input_node = NodeType(node_type)
+        # Checks every possible node
         if(NodeType.DistanceNode == input_node):
             self.node_input_factory.create_distance_node_input(value, name,
                                                                node_name)

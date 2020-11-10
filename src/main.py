@@ -1,6 +1,6 @@
 import yaml
 from listener.can_open_listener import CanOpenListener
-from interpreter_classes import CanOpenInterpreter
+from interpreter.can_open_interpreter import CanOpenInterpreter
 from time import sleep
 
 if __name__ == "__main__":

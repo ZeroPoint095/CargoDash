@@ -18,12 +18,10 @@ class MeasuringSlaveNode:
             self.config = yaml.safe_load(ymlfile)
         # local node
         self.connectToNetwork(canopen.Network())
-        self.network.create_node(1, '../eds_files/measuring_distance_node.eds')
+        self.network.create_node(1, '../eds_files/Arduino1.eds')
         while True:
             sleep(1)
             print(self.network[1].sdo[0x2000].phys)
-            self.network[1].sdo.download(0x2000, 0, bytes(
-                [self.network[1].sdo[0x2000].phys + 1, 0]))
             self.network.sync.transmit()
 
     def connectToNetwork(self, network):

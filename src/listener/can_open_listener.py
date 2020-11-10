@@ -108,8 +108,10 @@ class CanOpenListener(Listener):
             self.node_purposes.append(nodes[i]['node_purpose'])
             # Either adds local or remote node bases on config for each node
             if(nodes[i]['local']):
+                # Create a local node
                 self.network.create_node(i + 1, nodes[i]['eds_location'])
             else:
+                # Add a remote node
                 self.network.add_node(i + 1, nodes[i]['eds_location'])
 
     def inform_interpreter(self, sdo_value, sdo_name, node_id):

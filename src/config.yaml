@@ -9,7 +9,7 @@ canopen_vcan:
 canopen_serial:
     bustype: slcan
     channel: /dev/ttyACM0
-    bitrate: 250000
+    bitrate: 500000
     nodes: []
     raw_can_data_logging: false
     #TODO: whatever needs to be in "nodes" field

@@ -1,5 +1,6 @@
 from enum import Enum
 from abc import ABC
+from node_input_factory.node_input_enums import NodeType
 from node_input_factory.node_input_classes import (DistanceNodeInput,
                                                    SteeringNodeInput,
                                                    CoordinationNodeInput,
@@ -16,16 +17,34 @@ class WheelPosition(Enum):
     rear_right = 3
 
 
-class Steering:
-    def __init__(self, steering_radius: float):
-        self.current_steering_radius = steering_radius
+class Node(ABC):
+    def __init__(self, purpose):
+        # Purpose of the node itself.
+        self.purpose = purpose
+        # Variables that the node uses.
+        # Variable includes name and value.
+        self.variables = []
+
+    def update_variable_list(self, name, value):
+        updated = False
+        for variable in self.variables:
+            if(variable['name'] == name):
+                updated = True
+                variable['value'] = value
+        if(not updated):
+            self.variables.append({'name': name, 'value': value})
+
+
+class Steering(Node):
+    def __init__(self):
+        self.current_steering_radius = 0
 
     def change_radius(self, steering_radius: float):
         # Changes the current steering radius.
         self.current_steering_radius = steering_radius
 
 
-class Engine:
+class Engine(Node):
     def __init__(self):
         self.engine_running = False
 
@@ -48,33 +67,79 @@ class Vehicle(ABC):
             average_speed += wheel.speed
         return float(average_speed / len(self.wheels))
 
+
+class ConfigureableVehicle(Vehicle):
+    ''' This vehicle is completely dependent on the nodes
+        where it should listen to.
+    '''
+    def __init__(self, config, config_type):
+        self.distance_nodes = []
+        self.coordination_nodes = []
+        self.temperature_nodes = []
+        self.engine_nodes = []
+        nodes = config[config_type]['nodes']
+        for i in range(len(nodes)):
+            self._add_node_to_vehicle(nodes[i]['node_purpose'])
+        Vehicle.__init__(self)
+    
+    def _add_node_to_vehicle(self, node_purpose):
+        node_type = NodeType(node_purpose['type'])
+        if(node_type == NodeType.DistanceNode):
+            if(len(self.distance_nodes) == 0):
+                new_node = DistanceSensor(node_purpose['name'])
+                self.distance_nodes.append(new_node)
+            else:
+                pass
+        elif(node_type == NodeType.SteeringNode):
+            if(self.steering is None):
+                pass
+            else:
+                print('?? 2 steering nodes ??')
+        elif(node_type == NodeType.CoordinationNode):
+            if(len(self.coordination_nodes) == 0):
+                pass
+            else:
+                pass
+        elif(node_type == NodeType.EngineNode):
+            if(len(self.engine_nodes) == 0):
+                pass
+            else:
+                pass
+        elif(node_type == NodeType.TemperatureNode):
+            if(len(self.temperature_nodes) == 0):
+                pass
+            else:
+                pass
+
     def edit_vehicle_state(self, node_input):
         input_type = type(node_input)
         if(input_type == DistanceNodeInput):
-            print('distance input incoming')
+            node = self._get_node(self.distance_nodes, node_input)
+            if(node is not None):
+                node.distance = node_input.value
         elif(input_type == SteeringNodeInput):
             print('steering input incoming')
         elif(input_type == CoordinationNodeInput):
-            print('coordination input incoming')
+            node = self._get_node(self.coordination_nodes, node_input)
+            if(node is not None):
+                pass
         elif(input_type == EngineNodeInput):
-            print('engine input incoming')
+            node = self._get_node(self.engine_nodes, node_input)
+            if(node is not None):
+                pass
         elif(input_type == TemperatureNodeInput):
-            print('temperature input incoming')
+            node = self._get_node(self.temperature_nodes, node_input)
+            if(node is not None):
+                pass
+
+    def _get_node(self, node_list, node_input):
+        for node in node_list:
+            if(node.purpose == node_input.node_purpose):
+                return node
+        return None
 
 
-class Coach(Vehicle):
-    def __init__(self, config):
-        self.wheels = [Wheel(27, wheel_position, 100, 2.1)
-                       for wheel_position in range(4)]
-        self.throttle = Throttle()
-        self.brake = Brake()
-        self.engine = Engine()
-        self.steering = Steering(0)
-        self.emergency_stop = EmergencyStop()
-        Vehicle.__init__(self)
-
-
-class Wheel:
+class Wheel(Node):
     def __init__(self, wheel_diameter: float, wheel_position: int,
                  suspension_stiffness: float, tire_pressure: float):
         self.tire = Tire(wheel_diameter, tire_pressure)
@@ -100,12 +165,12 @@ class Tire:
         self.tire_pressure = tire_pressure
 
 
-class Suspension:
+class Suspension(Node):
     def __init__(self, stiffness: float):
         self.stiffness = stiffness
 
 
-class Throttle:
+class Throttle(Node):
     def __init__(self):
         pass
 
@@ -114,7 +179,7 @@ class Throttle:
         pass
 
 
-class Brake:
+class Brake(Node):
     def __init__(self):
         # Inherent from wheel?
         pass
@@ -126,7 +191,7 @@ class Brake:
         pass
 
 
-class EmergencyStop:
+class EmergencyStop(Node):
     def __init__(self):
         pass
 
@@ -135,9 +200,10 @@ class EmergencyStop:
         pass
 
 
-class DistanceSensor:
-    def __init__(self):
+class DistanceSensor(Node):
+    def __init__(self, purpose):
         self.distance = 0
+        super().__init__(purpose)
 
     def set_distance(self, distance: float):
         self.distance = distance

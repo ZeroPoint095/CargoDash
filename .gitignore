@@ -1,4 +1,5 @@
 src/Pipfile
 src/.vscode/**
 src/.mypy_cache/**
+src/logs/**
 .vscode/**

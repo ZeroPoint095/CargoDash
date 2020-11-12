@@ -1,5 +1,10 @@
 from enum import Enum
 from abc import ABC
+from node_input_factory.node_input_classes import (DistanceNodeInput,
+                                                   SteeringNodeInput,
+                                                   CoordinationNodeInput,
+                                                   EngineNodeInput,
+                                                   TemperatureNodeInput)
 
 MAX_SPEED = 3
 
@@ -34,8 +39,7 @@ class Engine:
 
 
 class Vehicle(ABC):
-    def __init__(self, steering: Steering):
-        self.steering = steering
+    def __init__(self):
         super().__init__()
 
     def get_speed(self):
@@ -44,16 +48,30 @@ class Vehicle(ABC):
             average_speed += wheel.speed
         return float(average_speed / len(self.wheels))
 
+    def edit_vehicle_state(self, node_input):
+        input_type = type(node_input)
+        if(input_type == DistanceNodeInput):
+            print('distance input incoming')
+        elif(input_type == SteeringNodeInput):
+            print('steering input incoming')
+        elif(input_type == CoordinationNodeInput):
+            print('coordination input incoming')
+        elif(input_type == EngineNodeInput):
+            print('engine input incoming')
+        elif(input_type == TemperatureNodeInput):
+            print('temperature input incoming')
+
 
 class Coach(Vehicle):
-    def __init__(self, engine: Engine, steering: Steering):
-        self.engine = engine
+    def __init__(self, config):
         self.wheels = [Wheel(27, wheel_position, 100, 2.1)
                        for wheel_position in range(4)]
         self.throttle = Throttle()
         self.brake = Brake()
+        self.engine = Engine()
+        self.steering = Steering(0)
         self.emergency_stop = EmergencyStop()
-        Vehicle.__init__(self, steering)
+        Vehicle.__init__(self)
 
 
 class Wheel:
@@ -117,5 +135,9 @@ class EmergencyStop:
         pass
 
 
-Vehicle(Steering(90))
-Coach(Engine(), Steering(90))
+class DistanceSensor:
+    def __init__(self):
+        self.distance = 0
+
+    def set_distance(self, distance: float):
+        self.distance = distance

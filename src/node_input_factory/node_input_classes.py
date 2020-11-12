@@ -39,7 +39,7 @@ class NodeInput(ABC):
 class DistanceNodeInput(NodeInput):
     # Enum 0
     # Distance as object distance
-    def __init__(self, distance: float, name: str, node_purpose: str):
+    def __init__(self, distance, name, node_purpose):
         super().__init__(distance, name, node_purpose)
 
 

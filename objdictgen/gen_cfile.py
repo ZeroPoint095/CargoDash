@@ -120,7 +120,8 @@ def GenerateFileContent(Node, headerfilepath, pointers_dict = {}):
     
     texts = {}
     texts["maxPDOtransmit"] = 0
-    texts["NodeName"] = Node.GetNodeName()
+    #texts["NodeName"] = Node.GetNodeName()
+    texts["NodeName"] = "ObjDict"
     texts["NodeID"] = Node.GetNodeID()
     texts["NodeType"] = Node.GetNodeType()
     texts["Description"] = Node.GetNodeDescription()

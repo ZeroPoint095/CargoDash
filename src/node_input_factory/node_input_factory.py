@@ -15,9 +15,9 @@ class NodeInputFactory:
         return DistanceNodeInput(distance,
                                  name, node_purpose_name)
 
-    def create_steering_node_input(self, steering_radius: float,
+    def create_steering_node_input(self, steering_angle: float,
                                    name: str, node_purpose_name: str):
-        return SteeringNodeInput(steering_radius,
+        return SteeringNodeInput(steering_angle,
                                  name, node_purpose_name)
 
     def create_coordination_node_input(self, location, name: str,

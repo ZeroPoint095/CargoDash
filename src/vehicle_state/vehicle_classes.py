@@ -36,12 +36,12 @@ class Node(ABC):
 
 class Steering(Node):
     def __init__(self, purpose):
-        self.current_steering_radius = 0
+        self.current_steering_angle = 0
         super().__init__(purpose)
 
-    def change_radius(self, steering_radius: float):
-        # Changes the current steering radius.
-        self.current_steering_radius = steering_radius
+    def change_angle(self, steering_angle: float):
+        # Changes the current steering angle.
+        self.current_steering_angle = steering_angle
 
 
 class Engine(Node):
@@ -112,7 +112,7 @@ class ConfigureableVehicle(Vehicle):
                 node.set_distance(node_input.value)
         elif(input_type == SteeringNodeInput):
             if(self.steering is not None):
-                self.steering.change_radius(node_input.value)
+                self.steering.change_angle(node_input.value)
         elif(input_type == CoordinationNodeInput):
             # TODO: add CoordinationNode for now less relevant
             pass

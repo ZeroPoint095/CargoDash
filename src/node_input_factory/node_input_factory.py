@@ -1,4 +1,3 @@
-from struct import unpack
 from node_input_factory.node_input_classes import (DistanceNodeInput,
                                                    SteeringNodeInput,
                                                    CoordinationNodeInput,
@@ -11,29 +10,32 @@ class NodeInputFactory:
     def __init__(self):
         pass
 
-    def create_distance_node_input(self, distance, name, node_purpose_name):
-        return DistanceNodeInput(unpack('h', distance)[0],
+    def create_distance_node_input(self, distance: float,
+                                   name: str, node_purpose_name: str):
+        return DistanceNodeInput(distance,
                                  name, node_purpose_name)
 
-    def create_steering_node_input(self, steering_radius,
-                                   name, node_purpose_name):
-        return SteeringNodeInput(unpack('h', steering_radius)[0],
+    def create_steering_node_input(self, steering_radius: float,
+                                   name: str, node_purpose_name: str):
+        return SteeringNodeInput(steering_radius,
                                  name, node_purpose_name)
 
-    def create_coordination_node_input(self, location, name,
-                                       node_purpose_name):
-        # not sure how data will look like
+    def create_coordination_node_input(self, location, name: str,
+                                       node_purpose_name: str):
+        # not sure how data will look like for location
         return CoordinationNodeInput(location, name, node_purpose_name)
 
-    def create_engine_node_input(self, set_engine, name, node_purpose_name):
-        return EngineNodeInput(unpack('h', set_engine)[0],
+    def create_engine_node_input(self, set_engine: int,
+                                 name: str, node_purpose_name: str):
+        return EngineNodeInput(set_engine,
                                name, node_purpose_name)
 
-    def create_temperature_node_input(self, temperature, name,
-                                      node_purpose_name):
-        return TemperatureNodeInput(unpack('h', temperature)[0],
+    def create_temperature_node_input(self, temperature: float,
+                                      name: str, node_purpose_name: str):
+        return TemperatureNodeInput(temperature,
                                     name, node_purpose_name)
 
-    def create_servo_node_input(self, angle, name, node_purpose_name):
-        return ServoNodeInput(unpack('h', angle)[0],
+    def create_servo_node_input(self, angle: float,
+                                name: str, node_purpose_name: str):
+        return ServoNodeInput(angle,
                               name, node_purpose_name)

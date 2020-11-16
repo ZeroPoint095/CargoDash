@@ -39,7 +39,7 @@ class NodeInput(ABC):
 class DistanceNodeInput(NodeInput):
     # Enum 0
     # Distance as object distance
-    def __init__(self, distance, name, node_purpose):
+    def __init__(self, distance: float, name: str, node_purpose: str):
         super().__init__(distance, name, node_purpose)
 
 
@@ -57,7 +57,7 @@ class CoordinationNodeInput(NodeInput):
 
 class EngineNodeInput(NodeInput):
     # Enum 3
-    def __init__(self, set_engine: bool, name: str, node_purpose: str):
+    def __init__(self, set_engine: int, name: str, node_purpose: str):
         super().__init__(set_engine, name, node_purpose)
 
 

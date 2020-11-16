@@ -75,6 +75,14 @@ class ConfigureableVehicle(Vehicle):
         in the config.yaml file.
     '''
     def __init__(self, config, config_type):
+        ''' config : yaml_file_stream
+                The configured yaml file that contains details for the
+                connection type.
+
+            config_type: string
+                The selected configuration that is going to be used.
+                The configurations are defined in 'config.yaml'.
+        '''
         self.config = config
         self.distance_nodes = []
         self.temperature_nodes = []
@@ -87,7 +95,42 @@ class ConfigureableVehicle(Vehicle):
             self._add_node_to_vehicle(nodes[i]['node_purpose'])
         Vehicle.__init__(self)
 
+    def edit_vehicle_state(self, node_input):
+        ''' Changes the vehicle state with a incoming
+            node input.
+
+            node_input : any NodeInput
+                The node input that came from the interpreter. That gives
+                the changes as an input for the vehicle state.
+
+        '''
+        input_type = type(node_input)
+
+        if(input_type == DistanceNodeInput):
+            node = self._get_node(self.distance_nodes, node_input)
+            if(node is not None):
+                node.set_distance(node_input.value)
+        elif(input_type == SteeringNodeInput):
+            if(self.steering is not None):
+                self.steering.change_radius(node_input.value)
+        elif(input_type == CoordinationNodeInput):
+            # TODO: add CoordinationNode for now less relevant
+            pass
+        elif(input_type == EngineNodeInput):
+            node = self._get_node(self.engine_nodes, node_input)
+            if(node is not None):
+                node.turn_on_off(node_input.value)
+        elif(input_type == TemperatureNodeInput):
+            # TODO: add TemperatureNode for now less relevant
+            pass
+        elif(input_type == ServoNodeInput):
+            node = self._get_node(self.servo_nodes, node_input)
+            if(node is not None):
+                node.set_angle(node_input.value)
+
     def _add_node_to_vehicle(self, node_purpose):
+        # Automatically add nodes that are defined in the
+        # config.yaml file.
         node_type = NodeType(node_purpose['type'])
         node_name = node_purpose['name']
 
@@ -117,31 +160,6 @@ class ConfigureableVehicle(Vehicle):
                                           node_name)):
                 new_node = Servo(node_name)
                 self.servo_nodes.append(new_node)
-
-    def edit_vehicle_state(self, node_input):
-        input_type = type(node_input)
-
-        if(input_type == DistanceNodeInput):
-            node = self._get_node(self.distance_nodes, node_input)
-            if(node is not None):
-                node.set_distance(node_input.value)
-        elif(input_type == SteeringNodeInput):
-            if(self.steering is not None):
-                self.steering.change_radius(node_input.value)
-        elif(input_type == CoordinationNodeInput):
-            # TODO: add CoordinationNode for now less relevant
-            pass
-        elif(input_type == EngineNodeInput):
-            node = self._get_node(self.engine_nodes, node_input)
-            if(node is not None):
-                node.turn_on_off(node_input.value)
-        elif(input_type == TemperatureNodeInput):
-            # TODO: add TemperatureNode for now less relevant
-            pass
-        elif(input_type == ServoNodeInput):
-            node = self._get_node(self.servo_nodes, node_input)
-            if(node is not None):
-                node.set_angle(node_input.value)
 
     def _get_node(self, node_list, node_input):
         for node in node_list:

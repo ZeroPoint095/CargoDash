@@ -2,8 +2,7 @@ from node_input_factory.node_input_classes import (DistanceNodeInput,
                                                    SteeringNodeInput,
                                                    LocalizationNodeInput,
                                                    EngineNodeInput,
-                                                   TemperatureNodeInput,
-                                                   ServoNodeInput)
+                                                   TemperatureNodeInput)
 
 
 class NodeInputFactory:
@@ -34,9 +33,3 @@ class NodeInputFactory:
                                       name: str, node_purpose_name: str):
         return TemperatureNodeInput(temperature,
                                     name, node_purpose_name)
-
-    def create_servo_node_input(self, angle: float,
-                                name: str, node_purpose_name: str):
-        # This only used for demoing purpose
-        return ServoNodeInput(angle,
-                              name, node_purpose_name)

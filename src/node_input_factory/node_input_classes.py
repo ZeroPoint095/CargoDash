@@ -57,7 +57,7 @@ class CoordinationNodeInput(NodeInput):
 
 class EngineNodeInput(NodeInput):
     # Enum 3
-    def __init__(self, set_engine: int, name: str, node_purpose: str):
+    def __init__(self, set_engine: bool, name: str, node_purpose: str):
         super().__init__(set_engine, name, node_purpose)
 
 

@@ -42,8 +42,9 @@ class CanOpenInterpreter(Interpreter):
             n_input = self.node_input_factory.create_coordination_node_input(
                 value, name, node_name)
         elif(NodeType.EngineNode == node_type):
+            value_to_bool = True if unpack('h', value)[0] == 1 else False
             n_input = self.node_input_factory.create_engine_node_input(
-                unpack('h', value)[0], name, node_name)
+                value_to_bool, name, node_name)
         elif(NodeType.ServoNode == node_type):
             n_input = self.node_input_factory.create_servo_node_input(
                 unpack('h', value)[0], name, node_name)

@@ -25,7 +25,7 @@ class NodeInputFactory:
         # not sure how data will look like for location
         return CoordinationNodeInput(location, name, node_purpose_name)
 
-    def create_engine_node_input(self, set_engine: int,
+    def create_engine_node_input(self, set_engine: bool,
                                  name: str, node_purpose_name: str):
         return EngineNodeInput(set_engine,
                                name, node_purpose_name)

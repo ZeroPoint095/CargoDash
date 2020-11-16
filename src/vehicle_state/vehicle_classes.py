@@ -49,8 +49,8 @@ class Engine(Node):
         self.engine_running = False
         super().__init__(purpose)
 
-    def turn_on_off(self, state):
-        if(state == 1):
+    def turn_on_off(self, on):
+        if(on):
             # Turns engine on.
             self.engine_running = True
         else:

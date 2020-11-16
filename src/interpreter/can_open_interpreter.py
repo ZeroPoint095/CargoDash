@@ -46,6 +46,7 @@ class CanOpenInterpreter(Interpreter):
             n_input = self.node_input_factory.create_engine_node_input(
                 value_to_bool, name, node_name)
         elif(NodeType.ServoNode == node_type):
+            # This only used for demoing purpose
             n_input = self.node_input_factory.create_servo_node_input(
                 unpack('h', value)[0], name, node_name)
         else:

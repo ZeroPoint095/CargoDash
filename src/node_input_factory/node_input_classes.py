@@ -69,5 +69,6 @@ class TemperatureNodeInput(NodeInput):
 
 class ServoNodeInput(NodeInput):
     # Enum 5
+    # This only used for demoing purpose
     def __init__(self, angle: float, name: str, node_purpose: str):
         super().__init__(angle, name, node_purpose)

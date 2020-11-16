@@ -37,5 +37,6 @@ class NodeInputFactory:
 
     def create_servo_node_input(self, angle: float,
                                 name: str, node_purpose_name: str):
+        # This only used for demoing purpose
         return ServoNodeInput(angle,
                               name, node_purpose_name)

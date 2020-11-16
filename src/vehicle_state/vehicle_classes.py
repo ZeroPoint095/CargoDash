@@ -248,6 +248,7 @@ class DistanceSensor(Node):
 
 
 class Servo(Node):
+    # This only used for demoing purpose
     def __init__(self, purpose):
         self.angle = 0
         super().__init__(purpose)

@@ -1,6 +1,6 @@
 from node_input_factory.node_input_classes import (DistanceNodeInput,
                                                    SteeringNodeInput,
-                                                   CoordinationNodeInput,
+                                                   LocalizationNodeInput,
                                                    EngineNodeInput,
                                                    TemperatureNodeInput,
                                                    ServoNodeInput)
@@ -20,10 +20,10 @@ class NodeInputFactory:
         return SteeringNodeInput(steering_angle,
                                  name, node_purpose_name)
 
-    def create_coordination_node_input(self, location, name: str,
+    def create_localization_node_input(self, location, name: str,
                                        node_purpose_name: str):
         # not sure how data will look like for location
-        return CoordinationNodeInput(location, name, node_purpose_name)
+        return LocalizationNodeInput(location, name, node_purpose_name)
 
     def create_engine_node_input(self, set_engine: bool,
                                  name: str, node_purpose_name: str):

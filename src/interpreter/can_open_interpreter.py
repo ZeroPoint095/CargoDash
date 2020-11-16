@@ -38,8 +38,8 @@ class CanOpenInterpreter(Interpreter):
         elif(NodeType.SteeringNode == node_type):
             n_input = self.node_input_factory.create_steering_node_input(
                 unpack('h', value)[0], name, node_name)
-        elif(NodeType.CoordinationNode == node_type):
-            n_input = self.node_input_factory.create_coordination_node_input(
+        elif(NodeType.LocalizationNode == node_type):
+            n_input = self.node_input_factory.create_localization_node_input(
                 value, name, node_name)
         elif(NodeType.EngineNode == node_type):
             value_to_bool = True if unpack('h', value)[0] == 1 else False

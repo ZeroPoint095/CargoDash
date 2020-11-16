@@ -3,7 +3,7 @@ from abc import ABC
 from node_input_factory.node_input_enums import NodeType
 from node_input_factory.node_input_classes import (DistanceNodeInput,
                                                    SteeringNodeInput,
-                                                   CoordinationNodeInput,
+                                                   LocalizationNodeInput,
                                                    EngineNodeInput,
                                                    TemperatureNodeInput,
                                                    ServoNodeInput)
@@ -113,8 +113,8 @@ class ConfigureableVehicle(Vehicle):
         elif(input_type == SteeringNodeInput):
             if(self.steering is not None):
                 self.steering.change_angle(node_input.value)
-        elif(input_type == CoordinationNodeInput):
-            # TODO: add CoordinationNode for now less relevant
+        elif(input_type == LocalizationNodeInput):
+            # TODO: add LocalizationNode for now less relevant
             pass
         elif(input_type == EngineNodeInput):
             node = self._get_node(self.engine_nodes, node_input)
@@ -144,8 +144,8 @@ class ConfigureableVehicle(Vehicle):
             # expect multiple steering nodes in general.
             if(self.steering is None):
                 self.steering = Steering(node_name)
-        elif(node_type == NodeType.CoordinationNode):
-            # TODO: add CoordinationNode for now less relevant
+        elif(node_type == NodeType.LocalizationNode):
+            # TODO: add LocalizationNode for now less relevant
             pass
         elif(node_type == NodeType.EngineNode):
             if(not self._is_node_existing(self.engine_nodes,

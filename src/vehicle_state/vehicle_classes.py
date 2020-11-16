@@ -5,7 +5,8 @@ from node_input_factory.node_input_classes import (DistanceNodeInput,
                                                    SteeringNodeInput,
                                                    CoordinationNodeInput,
                                                    EngineNodeInput,
-                                                   TemperatureNodeInput)
+                                                   TemperatureNodeInput,
+                                                   ServoNodeInput)
 
 
 class WheelPosition(Enum):
@@ -70,15 +71,17 @@ class Vehicle(ABC):
 
 class ConfigureableVehicle(Vehicle):
     ''' This vehicle is completely dependent on the nodes
-        where it should listen to.
+        where it should listen to. The nodes are configured
+        in the config.yaml file.
     '''
     def __init__(self, config, config_type):
         self.config = config
         self.distance_nodes = []
         self.temperature_nodes = []
         self.engine_nodes = []
+        self.servo_nodes = []
         nodes = config[config_type]['nodes']
-        # Firstly initializes vehicle according nodes that
+        # Firstly, initializes vehicle according nodes that
         # are listed in the configuration file.
         for i in range(len(nodes)):
             self._add_node_to_vehicle(nodes[i]['node_purpose'])
@@ -94,10 +97,12 @@ class ConfigureableVehicle(Vehicle):
                 new_node = DistanceSensor(node_name)
                 self.distance_nodes.append(new_node)
         elif(node_type == NodeType.SteeringNode):
+            # We don't keep a list for steering because we don't
+            # expect multiple steering nodes in general.
             if(self.steering is None):
                 self.steering = Steering(node_name)
         elif(node_type == NodeType.CoordinationNode):
-            # TODO: add CoordinationNode
+            # TODO: add CoordinationNode for now less relevant
             pass
         elif(node_type == NodeType.EngineNode):
             if(not self._is_node_existing(self.engine_nodes,
@@ -105,8 +110,13 @@ class ConfigureableVehicle(Vehicle):
                 new_node = Engine(node_name)
                 self.engine_nodes.append(new_node)
         elif(node_type == NodeType.TemperatureNode):
-            # TODO: add TemperatureNode
+            # TODO: add TemperatureNode for now less relevant
             pass
+        elif(node_type == NodeType.ServoNode):
+            if(not self._is_node_existing(self.servo_nodes,
+                                          node_name)):
+                new_node = Servo(node_name)
+                self.servo_nodes.append(new_node)
 
     def edit_vehicle_state(self, node_input):
         input_type = type(node_input)
@@ -119,15 +129,19 @@ class ConfigureableVehicle(Vehicle):
             if(self.steering is not None):
                 self.steering.change_radius(node_input.value)
         elif(input_type == CoordinationNodeInput):
-            # TODO: add CoordinationNode
+            # TODO: add CoordinationNode for now less relevant
             pass
         elif(input_type == EngineNodeInput):
             node = self._get_node(self.engine_nodes, node_input)
             if(node is not None):
                 node.turn_on_off(node_input.value)
         elif(input_type == TemperatureNodeInput):
-            # TODO: add TemperatureNode
+            # TODO: add TemperatureNode for now less relevant
             pass
+        elif(input_type == ServoNodeInput):
+            node = self._get_node(self.servo_nodes, node_input)
+            if(node is not None):
+                node.set_angle(node_input.value)
 
     def _get_node(self, node_list, node_input):
         for node in node_list:
@@ -213,3 +227,12 @@ class DistanceSensor(Node):
 
     def set_distance(self, distance):
         self.distance = distance
+
+
+class Servo(Node):
+    def __init__(self, purpose):
+        self.angle = 0
+        super().__init__(purpose)
+
+    def set_angle(self, angle):
+        self.angle = angle

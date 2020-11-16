@@ -43,6 +43,9 @@ class CanOpenInterpreter(Interpreter):
         elif(NodeType.EngineNode == node_type):
             n_input = self.node_input_factory.create_engine_node_input(
                 value, name, node_name)
+        elif(NodeType.ServoNode == node_type):
+            n_input = self.node_input_factory.create_servo_node_input(
+                value, name, node_name)
         else:
             n_input = self.node_input_factory.create_temperature_node_input(
                 value, name, node_name)

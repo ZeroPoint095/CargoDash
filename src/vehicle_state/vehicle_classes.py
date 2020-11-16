@@ -178,23 +178,24 @@ class ConfigureableVehicle(Vehicle):
 class Wheel(Node):
     def __init__(self, wheel_diameter: float, wheel_position: int,
                  suspension_stiffness: float, tire_pressure: float,
-                 max_speed=3):
+                 max_speed_in_ms=3):
         self.tire = Tire(wheel_diameter, tire_pressure)
         self.suspension = Suspension(suspension_stiffness)
         self.wheel_position = wheel_position
         self.speed = 0
-        self.max_speed = 3
+        self.max_speed_in_ms = 3
 
     def get_speed(self):
         return self.speed
 
     def set_speed(self, new_speed: float):
-        if new_speed <= self.max_speed:
+        if new_speed <= self.max_speed_in_ms:
             self.speed = new_speed
         else:
             print(new_speed, " exceeds max speed of ",
-                  self.max_speed, ". \n Speed set to ", self.max_speed)
-            self.speed = self.max_speed
+                  self.max_speed_in_ms, ". \n Speed set to ", 
+                  self.max_speed_in_ms)
+            self.speed = self.max_speed_in_ms
 
 
 class Tire:

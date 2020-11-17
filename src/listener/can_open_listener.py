@@ -152,7 +152,7 @@ class CanOpenListener(Listener):
     def export_raw_can_data(self):
         ''' Exports raw can data at once. When this triggered the raw can data
             with the size of the buffer is exported. This can be used when an
-            error/malfunction is occuring. 
+            error/malfunction is occuring.
         '''
 
         self.log_data(array2string(self.raw_data))

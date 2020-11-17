@@ -6,7 +6,6 @@ class Listener(ABC):
     def __init__(self, config):
         self.config = config
         self.directory = './logs/'
-        self.log_file = datetime.now().strftime('%d-%m-%Y-%H:%M:%S') + '.log'
         super().__init__()
 
     @abstractmethod
@@ -22,7 +21,8 @@ class Listener(ABC):
         pass
 
     def log_data(self, message):
-        log_file_location = self.directory + self.log_file
-        with open(log_file_location, 'a') as file:
-            file.write(message + '\n')
+        log_file_name = datetime.now().strftime('%d-%m-%Y-%H:%M:%S') + '.log'
+        log_file_location = self.directory + log_file_name
+        with open(log_file_location, 'w') as file:
+            file.write(message)
         file.close()

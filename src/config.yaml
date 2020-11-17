@@ -9,8 +9,6 @@ canopen_vcan:
         enabled: true,
         buffer: 1024
     }
-    raw_can_data_logging: false
-    raw_can_data_logging_buffer: 1024
 
 canopen_serial:
     bustype: slcan

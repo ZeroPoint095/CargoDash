@@ -7,6 +7,8 @@ canopen_vcan:
     max_speed_in_ms: 3
     raw_can_data_logging: {
         enabled: true,
+        # The value is the amount in raw can messages.
+        # Implementation saves raw can messages up until buffer's value. 
         buffer: 1024
     }
 

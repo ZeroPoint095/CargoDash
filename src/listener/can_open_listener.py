@@ -180,7 +180,8 @@ class CanOpenListener(Listener):
         return changed
 
     def _memorize_raw_data(self):
-        # Uses circular buffer implementation.
+        # Uses circular buffer implementation which overwrites
+        # oldest index with new data once the buffer is full.
         index = 0
         for raw_msg in self.raw_log_network.bus:
             index = (index + 1) % self.can_logging_buffer

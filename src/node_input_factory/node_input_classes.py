@@ -45,11 +45,11 @@ class DistanceNodeInput(NodeInput):
 
 class SteeringNodeInput(NodeInput):
     # Enum 1
-    def __init__(self, steering_radius: float, name: str, node_purpose: str):
-        super().__init__(steering_radius, name, node_purpose)
+    def __init__(self, steering_angle: float, name: str, node_purpose: str):
+        super().__init__(steering_angle, name, node_purpose)
 
 
-class CoordinationNodeInput(NodeInput):
+class LocalizationNodeInput(NodeInput):
     # Enum 2
     def __init__(self, location: str, name: str, node_purpose: str):
         super().__init__(location, name, node_purpose)

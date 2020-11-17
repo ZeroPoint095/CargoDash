@@ -1,11 +1,13 @@
 from interpreter.interpreter import Interpreter
 from node_input_factory.node_input_factory import NodeInputFactory
 from node_input_factory.node_input_enums import NodeType
+from struct import unpack
 
 
 class CanOpenInterpreter(Interpreter):
-    def __init__(self):
+    def __init__(self, vehicle):
         self.node_input_factory = NodeInputFactory()
+        self.vehicle = vehicle
         super().__init__()
 
     def inform_interpreter(self, sdo_value, sdo_name, node_purpose):
@@ -27,22 +29,23 @@ class CanOpenInterpreter(Interpreter):
         self._interpret_object(sdo_value, sdo_name,
                                node_purpose['name'], node_purpose['type'])
 
-    def _interpret_object(self, value, name, node_name, node_type):
-        input_node = NodeType(node_type)
+    def _interpret_object(self, value, name, node_name, node_type_index):
+        node_type = NodeType(node_type_index)
         # Checks every possible node
-        if(NodeType.DistanceNode == input_node):
-            self.node_input_factory.create_distance_node_input(value, name,
-                                                               node_name)
-        elif(NodeType.SteeringNode == input_node):
-            self.node_input_factory.create_steering_node_input(value, name,
-                                                               node_name)
-        elif(NodeType.CoordinationNode == input_node):
-            self.node_input_factory.create_coordination_node_input(value,
-                                                                   name,
-                                                                   node_name)
-        elif(NodeType.EngineNode == input_node):
-            self.node_input_factory.create_engine_node_input(value, name,
-                                                             node_name)
-        elif(NodeType.TemperatureNode == input_node):
-            self.node_input_factory.create_temperature_node_input(value, name,
-                                                                  node_name)
+        if(NodeType.DistanceNode == node_type):
+            n_input = self.node_input_factory.create_distance_node_input(
+                unpack('h', value)[0], name, node_name)
+        elif(NodeType.SteeringNode == node_type):
+            n_input = self.node_input_factory.create_steering_node_input(
+                unpack('h', value)[0], name, node_name)
+        elif(NodeType.LocalizationNode == node_type):
+            n_input = self.node_input_factory.create_localization_node_input(
+                value, name, node_name)
+        elif(NodeType.EngineNode == node_type):
+            value_to_bool = True if unpack('h', value)[0] == 1 else False
+            n_input = self.node_input_factory.create_engine_node_input(
+                value_to_bool, name, node_name)
+        else:
+            n_input = self.node_input_factory.create_temperature_node_input(
+                unpack('h', value)[0], name, node_name)
+        self.vehicle.edit_vehicle_state(n_input)

@@ -1211,7 +1211,7 @@ SupportedObjects=2
 [2000]
 ParameterName=Distance
 ObjectType=0x7
-DataType=0x0005
+DataType=0x0003
 AccessType=rw
-DefaultValue=0
+DefaultValue=1023
 PDOMapping=1

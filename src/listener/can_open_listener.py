@@ -3,6 +3,7 @@ import logging
 from threading import Thread
 
 from listener.listener import Listener
+from numpy import array, append
 from canopen.sdo.exceptions import SdoCommunicationError
 
 
@@ -23,8 +24,8 @@ class CanOpenListener(Listener):
                 The wanted interpreter that is going to be used.
         '''
         super().__init__(config)
-        self.observers = []
-        self.node_purposes = []
+        self.observers = array([])
+        self.node_purposes = array([])
         self.config_type = config_type
         self.network = self.connect_to_network()
         self._add_nodes(self.config[self.config_type]['nodes'])
@@ -105,7 +106,8 @@ class CanOpenListener(Listener):
 
     def _add_nodes(self, nodes):
         for i in range(len(nodes)):
-            self.node_purposes.append(nodes[i]['node_purpose'])
+            self.node_purposes = append(
+                self.node_purposes, nodes[i]['node_purpose'])
             # Either adds local or remote node bases on config for each node
             if(nodes[i]['local']):
                 # Create a local node
@@ -128,7 +130,6 @@ class CanOpenListener(Listener):
 
             Returns void.
         '''
-
         self.interpreter.inform_interpreter(sdo_value, sdo_name,
                                             self.node_purposes[node_id - 1])
 
@@ -156,7 +157,8 @@ class CanOpenListener(Listener):
                     observer['value'] = sdo_value
                     changed = True
         if(not found):
-            self.observers.append({'index': sdo_index, 'value': sdo_value})
+            self.observers = append(
+                self.observers, {'index': sdo_index, 'value': sdo_value})
             changed = True
         return changed
 

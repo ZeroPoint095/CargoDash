@@ -1,5 +1,6 @@
 from enum import Enum
 from abc import ABC
+from numpy import array, append
 from node_input_factory.node_input_enums import NodeType
 from node_input_factory.node_input_classes import (DistanceNodeInput,
                                                    SteeringNodeInput,
@@ -21,7 +22,7 @@ class Node(ABC):
         self.purpose = purpose
         # Variables that the node uses.
         # Variable includes name and value.
-        self.variables = []
+        self.variables = array([])
 
     def update_variable_list(self, name, value):
         updated = False
@@ -30,7 +31,8 @@ class Node(ABC):
                 updated = True
                 variable['value'] = value
         if(not updated):
-            self.variables.append({'name': name, 'value': value})
+            self.variables = append(
+                self.variables, {'name': name, 'value': value})
 
 
 class Steering(Node):
@@ -83,9 +85,9 @@ class ConfigureableVehicle(Vehicle):
                 The configurations are defined in 'config.yaml'.
         '''
         self.config = config
-        self.distance_nodes = []
-        self.temperature_nodes = []
-        self.engine_nodes = []
+        self.distance_nodes = array([])
+        self.temperature_nodes = array([])
+        self.engine_nodes = array([])
         nodes = config[config_type]['nodes']
         # Firstly, initializes vehicle according nodes that
         # are listed in the configuration file.
@@ -132,7 +134,8 @@ class ConfigureableVehicle(Vehicle):
             if(not self._is_node_existing(self.distance_nodes,
                                           node_name)):
                 new_node = DistanceSensor(node_name)
-                self.distance_nodes.append(new_node)
+                self.distance_nodes = append(
+                    self.distance_nodes, new_node)
         elif(node_type == NodeType.SteeringNode):
             # We don't keep a list for steering because we don't
             # expect multiple steering nodes in general.
@@ -145,7 +148,8 @@ class ConfigureableVehicle(Vehicle):
             if(not self._is_node_existing(self.engine_nodes,
                                           node_name)):
                 new_node = Engine(node_name)
-                self.engine_nodes.append(new_node)
+                self.engine_nodes = append(
+                    self.engine_nodes, new_node)
         elif(node_type == NodeType.TemperatureNode):
             # TODO: add TemperatureNode for now less relevant
             pass

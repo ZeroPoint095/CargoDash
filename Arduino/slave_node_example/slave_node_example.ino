@@ -1,9 +1,10 @@
 /*
 Example of a slave node using the CanOpen library based on Canfestivino
-Attach a potentiometer to A0
-Attach a Servo to pin 9
+Attach a sensor to A0 (this example uses a potentiometer)
+Attach an actuator to pin 9 (this examples uses a SG90 servo)
 Attach a MCP-2515 board using pin 10 as CS (you can change this in CO_can_Arduino.cpp if you need to)
-Upload sketch and open Serial Monitor (made sure baud is set to 115200
+  this example uses a Joy-It SBC-CAN01 MCP-2515 CAN Module
+Upload sketch and open Serial Monitor (made sure baud is set to 115200)
 Run canopen_master_example.py on another system attached to canbus network
  */
 
@@ -25,16 +26,16 @@ Run canopen_master_example.py on another system attached to canbus network
 CO<3, 4> co;
 
 // Setup the potentiometer to analog pin 0, servo to pin 9
-#define POT_PIN A0
-#define SERVO_PIN 9
+#define SENSOR_PIN A0
+#define ACTUATOR_PIN 9
 
 UNS32 readSensorCallback(const subindex * OD_entry, UNS16 bIndex, UNS8 bSubindex, UNS8 writeAccess) {
   Serial.print("Reading sensor: ");
-  Serial.println(analogRead(POT_PIN));
+  Serial.println(analogRead(SENSOR_PIN));
 
   if (!writeAccess)
     delay(10);
-  Sensor = analogRead(POT_PIN);
+  Sensor = analogRead(SENSOR_PIN);
   ObjDict_PDO_status[ObjDict_Data.currentPDO].event_trigger = 1;
 
   return 0;
@@ -42,14 +43,14 @@ UNS32 readSensorCallback(const subindex * OD_entry, UNS16 bIndex, UNS8 bSubindex
 
 
 
-Servo myservo; //initialise the actuator used in this example
+Servo actuator; //initialise the servo used in this example as an actuator
 int val;
 
 UNS32 writeActuatorCallback(const subindex * OD_entry, UNS16 bIndex, UNS8 bSubindex, UNS8 writeAccess) {
   Serial.print("Writing actuator:");
   Serial.println(Actuator);
   val = map(Actuator, 0, 1023, 0, 254); //maps the value of the sensor (0-1023) to a relative value between 0-254
-  myservo.write(val);
+  actuator.write(val);
   delay(2);
   return 0;
 }
@@ -57,9 +58,8 @@ UNS32 writeActuatorCallback(const subindex * OD_entry, UNS16 bIndex, UNS8 bSubin
 void setup() {
   co.CO_Init(); //intialise canopen via canbus
 
-  //analogReference(INTERNAL); //not sure what this is, was in original Canfestivino example .ino. It caused the analog read to go all funky though
-  pinMode(POT_PIN, INPUT); //setup potmeter pin
-  myservo.attach(SERVO_PIN); //attach datapin of servo
+  pinMode(SENSOR_PIN, INPUT); //setup potmeter pin
+  actuator.attach(ACTUATOR_PIN); //attach datapin of servo
 
   Serial.begin(115200);
 

@@ -24,6 +24,7 @@ class CanOpenListener(Listener):
             interpreter : CanOpenInterpreter
                 The wanted interpreter that is going to be used.
         '''
+
         super().__init__(config)
         self.observers = array([])
         self.node_purposes = array([])
@@ -135,6 +136,7 @@ class CanOpenListener(Listener):
 
             Returns void.
         '''
+        
         self.interpreter.inform_interpreter(sdo_value, sdo_name,
                                             self.node_purposes[node_id - 1])
 
@@ -153,6 +155,8 @@ class CanOpenListener(Listener):
         ''' Exports raw can data at once. When this triggered the raw can data
             with the size of the buffer is exported. This can be used when an
             error/malfunction is occuring.
+
+            Returns void.
         '''
 
         self.log_data(array2string(self.raw_data))

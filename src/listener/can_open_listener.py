@@ -136,7 +136,7 @@ class CanOpenListener(Listener):
 
             Returns void.
         '''
-        
+
         self.interpreter.inform_interpreter(sdo_value, sdo_name,
                                             self.node_purposes[node_id - 1])
 

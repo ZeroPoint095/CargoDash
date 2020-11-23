@@ -1,6 +1,7 @@
 import can
 import canopen
 import logging
+import asyncio
 from threading import Thread
 
 from listener.listener import Listener
@@ -32,15 +33,6 @@ class CanOpenListener(Listener):
         self.network = self.connect_to_network()
         self._add_nodes(self.config[self.config_type]['nodes'])
         self.interpreter = interpreter
-        can_logging = self.config[self.config_type]['raw_can_data_logging']
-        if(can_logging['enabled']):
-            # Creates new network connection because CANopen library has
-            # difficulties with multithreading on a single network connection.
-            self.raw_log_network = self.connect_to_network()
-            self.can_logging_buffer = can_logging['buffer']
-            self.raw_data = empty([self.can_logging_buffer], dtype=can.Message)
-            set_printoptions(threshold=self.can_logging_buffer)
-            Thread(target=self._memorize_raw_data).start()
 
     def connect_to_network(self):
         ''' Connects to a can network.
@@ -63,6 +55,11 @@ class CanOpenListener(Listener):
                           f' bitrate = {bitrate})')
         return network
 
+    async def network_loop(self):
+        while True:
+            self.listen_to_network()
+            await asyncio.sleep(0.1) 
+    
     def listen_to_network(self):
         ''' Listens to connected network and tries to find any value changes
             within any connected node.
@@ -151,16 +148,6 @@ class CanOpenListener(Listener):
 
         self.interpreter = interpreter
 
-    def export_raw_can_data(self):
-        ''' Exports raw can data at once. When this triggered the raw can data
-            with the size of the buffer is exported. This can be used when an
-            error/malfunction is occuring.
-
-            Returns void.
-        '''
-
-        self.log_data(array2string(self.raw_data))
-
     def _sdo_value_changed(self, sdo_index, sdo_value):
         # Couldn't find a possibility to subscribe to a value with the CANopen
         # library, so needed to make an implementation by myself.
@@ -179,11 +166,3 @@ class CanOpenListener(Listener):
             changed = True
         return changed
 
-    def _memorize_raw_data(self):
-        # Uses circular buffer implementation which overwrites
-        # oldest index with new data once the buffer is full.
-        index = 0
-        for raw_msg in self.raw_log_network.bus:
-            index = (index + 1) % self.can_logging_buffer
-            # If over buffer replace old data with new data.
-            self.raw_data[index] = raw_msg

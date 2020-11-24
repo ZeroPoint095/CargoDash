@@ -1,11 +1,9 @@
-import can
 import canopen
 import logging
 import asyncio
-from threading import Thread
 
 from listener.listener import Listener
-from numpy import array, append, array2string, empty, set_printoptions
+from numpy import array, append
 from canopen.sdo.exceptions import SdoCommunicationError
 
 
@@ -55,11 +53,6 @@ class CanOpenListener(Listener):
                           f' bitrate = {bitrate})')
         return network
 
-    async def network_loop(self):
-        while True:
-            self.listen_to_network()
-            await asyncio.sleep(0.1) 
-    
     def listen_to_network(self):
         ''' Listens to connected network and tries to find any value changes
             within any connected node.
@@ -88,6 +81,15 @@ class CanOpenListener(Listener):
                 except SdoCommunicationError:
                     logging.error(f'The requested sdo ({hex(sdo_index)})'
                                   ' is not received!')
+
+    async def async_network_loop(self):
+        ''' Function to loop the through all nodes asynchronously.
+            Loops forever.
+        '''
+        while True:
+            self.listen_to_network()
+            # Sleeps 0.1 seconds
+            await asyncio.sleep(0.1)
 
     def _read_complex_variable(self, sdo_client, sdo_index, node_id):
         for subindex in range(len(sdo_client[sdo_index]) + 1):
@@ -165,4 +167,3 @@ class CanOpenListener(Listener):
                 self.observers, {'index': sdo_index, 'value': sdo_value})
             changed = True
         return changed
-

@@ -9,6 +9,10 @@ class BufferLogger(ABC):
         super().__init__()
 
     @abstractmethod
+    def connect_to_network(self):
+        pass
+
+    @abstractmethod
     def listen_to_network(self):
         pass
 

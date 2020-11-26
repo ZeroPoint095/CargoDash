@@ -13,8 +13,6 @@ class CanBufferLogger(BufferLogger):
         super().__init__(config, config_type)
         can_logging = self.config[self.config_type]['raw_can_data_logging']
         if(can_logging['enabled']):
-            # Creates new network connection because CANopen library has
-            # difficulties with multithreading on a single network connection.
             self.can_logging_buffer = can_logging['buffer']
             self.buffered_data = empty([self.can_logging_buffer],
                                        dtype=can.Message)
@@ -44,13 +42,16 @@ class CanBufferLogger(BufferLogger):
         # Uses circular buffer implementation which overwrites
         # oldest index with new data once the buffer is full.
         index = 0
-        while True:
-            can_msg = await self.reader.get_message()
-            # Sleeps 0.1 seconds so doesn't try to read all messages at once.
-            await asyncio.sleep(0.1)
-            self.buffered_data[index] = can_msg
-            index = (index + 1) % self.can_logging_buffer
-        self._closing_async_listener()
+        try:
+            while True:
+                can_msg = await self.reader.get_message()
+                # Sleeps 0.1 seconds so doesn't try to read all messages 
+                # at once.
+                await asyncio.sleep(0.1)
+                self.buffered_data[index] = can_msg
+                index = (index + 1) % self.can_logging_buffer
+        except KeyboardInterrupt:
+            self._closing_async_listener()
 
     def release_memorized_messages(self):
         ''' Exports raw can data at once. When this triggered the raw can data
@@ -63,7 +64,7 @@ class CanBufferLogger(BufferLogger):
         self._log_data(array2string(self.buffered_data))
 
     def _log_data(self, message):
-        log_file_name = datetime.now().strftime('%d-%m-%Y-%H:%M:%S') + '.log'
+        log_file_name = datetime.now().strftime('%Y-%m-%d-%H:%M:%S') + '.log'
         log_file_location = self.directory + log_file_name
         with open(log_file_location, 'w') as file:
             file.write(message)

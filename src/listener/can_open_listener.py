@@ -86,10 +86,13 @@ class CanOpenListener(Listener):
         ''' Function to loop the through all nodes asynchronously.
             Loops forever.
         '''
-        while True:
-            self.listen_to_network()
-            # Sleeps 0.1 seconds
-            await asyncio.sleep(0.1)
+        try:
+            while True:
+                self.listen_to_network()
+                # Sleeps 0.1 seconds
+                await asyncio.sleep(0.1)
+        except KeyboardInterrupt:
+            pass
 
     def _read_complex_variable(self, sdo_client, sdo_index, node_id):
         for subindex in range(len(sdo_client[sdo_index]) + 1):

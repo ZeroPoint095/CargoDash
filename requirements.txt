@@ -1,4 +1,0 @@
-aiohttp
-canopen
-can
-numpy

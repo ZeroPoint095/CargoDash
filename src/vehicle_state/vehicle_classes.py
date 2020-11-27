@@ -147,7 +147,7 @@ class ConfigureableVehicle(Vehicle):
             # expect multiple steering nodes in general.
             if(self.steering is None):
                 self.steering = Steering(node_name)
-                self.steering = id_index
+                self.steering.id = id_index
         elif(node_type == NodeType.LocalizationNode):
             # TODO: add LocalizationNode for now less relevant
             pass

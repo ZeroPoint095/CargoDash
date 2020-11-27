@@ -1,7 +1,7 @@
 ﻿# CargoDash Usage Guide
 This document will help you to understand to make use of CargoDash. CargoDash is written in Python code (version 3.8.5). For any questions please for free to create an issue. For this project we follow the SI standards.
 
-## Requirements
+## Python Dependencies
 
     aiohttp v3.7.3
     can v3.3.4
@@ -16,6 +16,19 @@ CargoDash is a tool that listen to incoming messages and sets the values of thes
 
 ## Our usage
 We created CargoDash to listen to a CanOpen network and use it for the Smarterdam project. The Smarterdam project is funded by Rotterdam University of Applied Sciences. CargoDash is able to track all incoming can messages and we are able to give more meaning to messages that have been send and received.     
+
+## Installation
+1. Clone the repository
+
+    git clone https://github.com/ZeroPoint095/CargoDash
+
+2. Install the Python dependencies with pip3
+
+    pip3 install -r requirements.txt
+
+3. Run startup.sh to use CargoDash
+
+    ./startup.sh
 
 ## Using the configuration file for CanOpen (config.yaml)
 

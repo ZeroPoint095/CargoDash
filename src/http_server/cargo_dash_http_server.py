@@ -55,7 +55,7 @@ async def get_node(request):
 @routes.get('/node/{id}/{var_name}')
 async def get_variable(request):
     ''' Receives a get request that asks for a specific variable
-        of a specified variable.
+        of a specified node.
 
         Parameters
             id : id of a specified node expects number.
@@ -75,12 +75,34 @@ async def get_variable(request):
     pass
 
 
+@routes.post('/node/{id}/{var_name}')
+async def update_variable_value(request):
+    ''' Receives a post request that wants to update a value of specific variable
+        of a specified node.
+
+        Parameters:
+            id : id of a specified node expects number.
+            var_name: string of a specified variable name.
+
+        Request body:
+            {
+                value: 'new_value'
+            }
+
+        Note: This post request has lower importance for us. Hopefully we
+              are able to implement this.
+
+        Returns a message that says value is changed succesfully.
+    '''
+    pass
+
+
 @routes.get('/getloggingbuffer')
 async def get_logging_buffer(request):
     ''' Receives a get request that asks for the current logging buffer.
 
         Returns all raw can messages in json format.
-        
+
         Ex. returns
         [
             {

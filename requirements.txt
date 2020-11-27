@@ -1,0 +1,4 @@
+aiohttp
+canopen
+can
+numpy

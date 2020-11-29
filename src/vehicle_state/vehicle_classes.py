@@ -92,7 +92,7 @@ class ConfigureableVehicle(Vehicle):
         # Firstly, initializes vehicle according nodes that
         # are listed in the configuration file.
         for i in range(len(nodes)):
-            self._add_node_to_vehicle(nodes[i]['node_purpose'])
+            self._add_node_to_vehicle(nodes[i]['node_properties'])
         Vehicle.__init__(self)
 
     def edit_vehicle_state(self, node_input):
@@ -124,11 +124,11 @@ class ConfigureableVehicle(Vehicle):
             # TODO: add TemperatureNode for now less relevant
             pass
 
-    def _add_node_to_vehicle(self, node_purpose):
+    def _add_node_to_vehicle(self, node_properties):
         # Automatically add nodes that are defined in the
         # config.yaml file.
-        node_type = NodeType(node_purpose['type'])
-        node_name = node_purpose['name']
+        node_type = NodeType(node_properties['type'])
+        node_name = node_properties['name']
 
         if(node_type == NodeType.DistanceNode):
             if(not self._is_node_existing(self.distance_nodes,
@@ -156,7 +156,7 @@ class ConfigureableVehicle(Vehicle):
 
     def _get_node(self, node_list, node_input):
         for node in node_list:
-            if(node.purpose == node_input.node_purpose):
+            if(node.purpose == node_input.node_properties):
                 return node
         return None
 

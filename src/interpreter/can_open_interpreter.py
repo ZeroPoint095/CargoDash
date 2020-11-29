@@ -10,7 +10,7 @@ class CanOpenInterpreter(Interpreter):
         self.vehicle = vehicle
         super().__init__()
 
-    def inform_interpreter(self, sdo_value, sdo_name, node_purpose):
+    def inform_interpreter(self, sdo_value, sdo_name, node_properties):
         ''' This method is requested by the CanOpenListener when it notices
             changes at a certain sdo value.
 
@@ -20,14 +20,15 @@ class CanOpenInterpreter(Interpreter):
             sdo_object: string
                 The name of the SDO.
 
-            node_purpose: dictionary {name: string, type: integer}
+            node_properties: dictionary {name: string, type: integer}
                 A dictionary that contains a name/description about the node
                 and the type of the node.
 
             Returns void.
         '''
         self._interpret_object(sdo_value, sdo_name,
-                               node_purpose['name'], node_purpose['type'])
+                               node_properties['name'],
+                               node_properties['type'])
 
     def _interpret_object(self, value, name, node_name, node_type_index):
         node_type = NodeType(node_type_index)

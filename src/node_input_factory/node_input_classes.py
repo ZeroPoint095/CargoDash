@@ -2,7 +2,7 @@ from abc import ABC
 
 
 class NodeInput(ABC):
-    def __init__(self, value, name, node_purpose):
+    def __init__(self, value, name, node_properties):
         ''' NodeInput Object used to change to state of the vehicle.
 
             value : any
@@ -11,13 +11,13 @@ class NodeInput(ABC):
             name : string
                 Name given with the value.
 
-            node_purpose : string
+            node_properties : string
                 Description what the node is functioning for.
 
         '''
         self.name = name
         self.value = value
-        self.node_purpose = node_purpose
+        self.node_properties = node_properties
         super().__init__()
 
     def read_node_input(self):
@@ -39,29 +39,29 @@ class NodeInput(ABC):
 class DistanceNodeInput(NodeInput):
     # Enum 0
     # Distance as object distance
-    def __init__(self, distance: float, name: str, node_purpose: str):
-        super().__init__(distance, name, node_purpose)
+    def __init__(self, distance: float, name: str, node_properties: str):
+        super().__init__(distance, name, node_properties)
 
 
 class SteeringNodeInput(NodeInput):
     # Enum 1
-    def __init__(self, steering_angle: float, name: str, node_purpose: str):
-        super().__init__(steering_angle, name, node_purpose)
+    def __init__(self, steering_angle: float, name: str, node_properties: str):
+        super().__init__(steering_angle, name, node_properties)
 
 
 class LocalizationNodeInput(NodeInput):
     # Enum 2
-    def __init__(self, location: str, name: str, node_purpose: str):
-        super().__init__(location, name, node_purpose)
+    def __init__(self, location: str, name: str, node_properties: str):
+        super().__init__(location, name, node_properties)
 
 
 class EngineNodeInput(NodeInput):
     # Enum 3
-    def __init__(self, set_engine: bool, name: str, node_purpose: str):
-        super().__init__(set_engine, name, node_purpose)
+    def __init__(self, set_engine: bool, name: str, node_properties: str):
+        super().__init__(set_engine, name, node_properties)
 
 
 class TemperatureNodeInput(NodeInput):
     # Enum 4
-    def __init__(self, temperature: float, name: str, node_purpose: str):
-        super().__init__(temperature, name, node_purpose)
+    def __init__(self, temperature: float, name: str, node_properties: str):
+        super().__init__(temperature, name, node_properties)

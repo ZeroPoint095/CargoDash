@@ -1,6 +1,6 @@
 import canopen
 import logging
-from threading import Thread
+import asyncio
 
 from listener.listener import Listener
 from numpy import array, append
@@ -23,6 +23,7 @@ class CanOpenListener(Listener):
             interpreter : CanOpenInterpreter
                 The wanted interpreter that is going to be used.
         '''
+
         super().__init__(config)
         self.observers = array([])
         self.node_purposes = array([])
@@ -30,11 +31,6 @@ class CanOpenListener(Listener):
         self.network = self.connect_to_network()
         self._add_nodes(self.config[self.config_type]['nodes'])
         self.interpreter = interpreter
-        if(self.config[self.config_type]['raw_can_data_logging']):
-            # Creates new network connection because CANopen library has
-            # difficulties with multithreading on a single network connection.
-            self.raw_log_network = self.connect_to_network()
-            Thread(target=self._log_raw_data).start()
 
     def connect_to_network(self):
         ''' Connects to a can network.
@@ -86,6 +82,18 @@ class CanOpenListener(Listener):
                     logging.error(f'The requested sdo ({hex(sdo_index)})'
                                   ' is not received!')
 
+    async def async_network_loop(self):
+        ''' Function to loop the through all nodes asynchronously.
+            Loops forever.
+        '''
+        try:
+            while True:
+                self.listen_to_network()
+                # Sleeps 0.1 seconds
+                await asyncio.sleep(0.1)
+        except KeyboardInterrupt:
+            pass
+
     def _read_complex_variable(self, sdo_client, sdo_index, node_id):
         for subindex in range(len(sdo_client[sdo_index]) + 1):
             # Skips subindex 0 because there are no value changes around this
@@ -130,6 +138,7 @@ class CanOpenListener(Listener):
 
             Returns void.
         '''
+
         self.interpreter.inform_interpreter(sdo_value, sdo_name,
                                             self.node_purposes[node_id - 1])
 
@@ -161,7 +170,3 @@ class CanOpenListener(Listener):
                 self.observers, {'index': sdo_index, 'value': sdo_value})
             changed = True
         return changed
-
-    def _log_raw_data(self):
-        for raw_msg in self.raw_log_network.bus:
-            self.log_data(str(raw_msg))

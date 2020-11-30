@@ -1,13 +1,15 @@
 from abc import ABC, abstractmethod
 
 
-class Listener(ABC):
-    def __init__(self, config):
+class BufferLogger(ABC):
+    def __init__(self, config, config_type):
         self.config = config
+        self.config_type = config_type
+        self.directory = './logs/'
         super().__init__()
 
     @abstractmethod
-    def connect_to_network(self, channel):
+    def connect_to_network(self):
         pass
 
     @abstractmethod
@@ -15,6 +17,5 @@ class Listener(ABC):
         pass
 
     @abstractmethod
-    def inform_interpreter(self):
+    def release_memorized_messages(self):
         pass
-

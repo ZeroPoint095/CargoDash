@@ -97,8 +97,8 @@ At the end of the file add LidarNodeInput.
     ...
     class LidarNodeInput(NodeInput):
     # Enum 5
-    def __init__(self, distance: float, name: str, node_purpose: str):
-        super().__init__(distance, name, node_purpose)
+    def __init__(self, distance: float, name: str, node_name: str):
+        super().__init__(distance, name, node_name)
 
 ```
 **node_input_factory/node_input_factory.py:**
@@ -106,9 +106,9 @@ Inside the NodeInputFactory add a new method.
 ```python
     ...
     def create_lidar_node_input(self, distance: float,
-                                   name: str, node_purpose_name: str):
+                                   name: str, node_name: str):
         return LidarNodeInput(distance,
-                              name, node_purpose_name)
+                              name, node_name)
 ```
 And don't forget to include LidarNodeInput at the NodeInputFactory.
 **interpreter/can_open_interpreter.py:**

@@ -186,7 +186,7 @@ class Wheel(Node):
             self.speed = new_speed
         else:
             print(new_speed, " exceeds max speed of ",
-                  self.max_speed_in_ms, ". \n Speed set to ", 
+                  self.max_speed_in_ms, ". \n Speed set to ",
                   self.max_speed_in_ms)
             self.speed = self.max_speed_in_ms
 

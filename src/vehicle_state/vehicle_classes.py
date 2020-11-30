@@ -133,13 +133,13 @@ class ConfigureableVehicle(Vehicle):
 
         # ID used for HTTPSERVER this is not similar as
         # the node ids for the canbus network.
-        id_index = 0
+        http_index = 0
 
         if(node_type == NodeType.DistanceNode):
             if(not self._is_node_existing(self.distance_nodes,
                                           node_name)):
                 new_node = DistanceSensor(node_name)
-                new_node.id = id_index
+                new_node.id = http_index
                 self.distance_nodes = append(
                     self.distance_nodes, new_node)
         elif(node_type == NodeType.SteeringNode):
@@ -147,7 +147,7 @@ class ConfigureableVehicle(Vehicle):
             # expect multiple steering nodes in general.
             if(self.steering is None):
                 self.steering = Steering(node_name)
-                self.steering.id = id_index
+                self.steering.id = http_index
         elif(node_type == NodeType.LocalizationNode):
             # TODO: add LocalizationNode for now less relevant
             pass
@@ -155,13 +155,13 @@ class ConfigureableVehicle(Vehicle):
             if(not self._is_node_existing(self.engine_nodes,
                                           node_name)):
                 new_node = Engine(node_name)
-                new_node.id = id_index
+                new_node.id = http_index
                 self.engine_nodes = append(
                     self.engine_nodes, new_node)
         elif(node_type == NodeType.TemperatureNode):
             # TODO: add TemperatureNode for now less relevant
             pass
-        id_index = id_index + 1
+        http_index = http_index + 1
 
     def _get_node(self, node_list, node_input):
         for node in node_list:

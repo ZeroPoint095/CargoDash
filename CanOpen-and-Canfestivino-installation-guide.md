@@ -30,7 +30,7 @@ On the Arduino Uno, it's okay to supply 5V to both VCC and VCC1.
 \#TODO add wiring diagram
 
 ## Raspberry Setup
-###CANBUS Setup
+### CANBUS Setup
 
 To install the necessary extensions and to be able to use the CAN module with a Raspberry Pi using CanOpen, please update the package list and install the extensions can-ultis:
 
@@ -103,7 +103,7 @@ pi@raspberrypi:~ $ candump can0
 ```
 Stop running candump with the key combination `CTRL+C`
 
-###CanOpen Setup
+### CanOpen Setup
 We're almost ready to start running the example CanOpen network. First, install CanOpen for Python with the following command:
 
 ```
@@ -111,11 +111,11 @@ pip install canopen
 ```
 Now, open `canopen_master_example.py` in Thonny or your favorite IDE. If you were to run this, you will get `SdoCommunicationError("No SDO response received")`. This is because we still need to setup our Ardunio slave node
 
-##Ardunio Slave Node setup
+## Ardunio Slave Node setup
 Check that the Arduino is wired properly according to the wiring guide. Now, open `slave_node_example.ino` with the Arduino IDE and upload the sketch to the Uno. Once its finished uploading, open the Serial Monitor.
 
-##Running the complete CanOpen network example
-###On the Raspberry Pi
+## Running the complete CanOpen network example
+### On the Raspberry Pi
 Run candump using the following command:
 
 ```
@@ -138,15 +138,15 @@ In Thonny, open `can_open_master_example.py` if you haven't done so already and 
 
 In `candump`, you should see the values change accordingly when you turn the potentiometer
 
-###On the Arduino Uno
+### On the Arduino Uno
 Turn the knob on the potmeter and the servo should turn accordingly. Using the Arduino IDE Serial Monitor, it's possible to see which values are being sent and received (these should both be the same).
 
-##Editing the slave node .EDS
+## Editing the slave node .EDS
 > In a more complex CanOpen network, the master node would be able to request a slave node's .EDS file at runtime. It would also be able to edit the .EDS eg. to change the node ID. Embedded devices, such as the Arduino lack the resources to parse a large text file at runtime, so we must do this manually. This also means that every time the EDS changes, it will need to be generated, compiled and uploaded.
 
 Now that the example is working, you'll want to edit the sketch to add your own components that fit your own project. To do this, we will need to edit the .EDS file and generate new `.cpp` and `.h` files for the Ardunio sketch. We'll be doing this using a somewhat dated GUI application written and run in Python 2.7. We got this working in Ubuntu, as the GUI package used was not compatible with macOS nor Raspbian. It was not tested in WLS.
 
-###Installing the dependancies
+### Installing the dependancies
 Make sure you're in the `objdictgen` folder. If not, use the following command:
 
 ```
@@ -174,7 +174,7 @@ Finally, start the editor by running the following command from within the `objd
 python2 objdictedit.py
 ```
 
-###Starting objdictedit.py and opening the .EDS
+### Starting objdictedit.py and opening the .EDS
 From the `objdictgen` folder, run the editor with the following command:
 
 ```
@@ -184,16 +184,16 @@ Import a `.eds` file with `File > Import EDS file`.
 Open a `.od` file with `File > Open`
 There are some example files in `/examples`. `slave_node_example.od` is the same node file used by the Arduino sketch.
 
-###Changing .eds to fit your network
+### Changing .eds to fit your network
 First, be sure to change the name and ID of your node with `Edit > Node infos`
 > The CanOpen protocol gives the highest priority to the lowest ID number. Be sure to number your nodes accordingly
 
-####Adding or changing your own inputs and outputs
+#### Adding or changing your own inputs and outputs
 Under `0x2000-0x5FFF Manufacturer Specific` you can edit the existing `Sensor` and `Actuator` by `Right-Click > Rename` on either, and clicking on them and editing their fields on the right.
 However we recommend deleting these and adding new components according to the specifications of your devices.
 > Be sure to have the checkbox `Have callbacks` enables. If not, you won't be able to write callback functions in the Arduino sketch. When you have finished adding your components, we must then map the Transmit and Receive PDO's
 
-####Mapping the Receive PDO's (node inputs)
+#### Mapping the Receive PDO's (node inputs)
 Receive PDO's are the commands received from the network to the node. These are eg. values to move an actuator such as a servo.
 
 On the top left, click on `0x1600-17FF Receive PDO Mapping`.
@@ -202,7 +202,7 @@ On the bottom right, make sure `Have Callbacks` is checked
 On `subindex 0x01`, change the `value` to map to the desired `Manufacturer Specific` object by double-clicking on it and selecting the desired object from the dropdown list.
 Continue adding `PDO Receive`s for all of your expecting incoming messages, remembering to check `Have Callbacks`.
 
-####Mapping the Transmit PDO's (node outputs)
+#### Mapping the Transmit PDO's (node outputs)
 Transmit PDO's is the data transmitted from the node to the network after receiving a request for said data. These are eg. values read from a sensor such as a distance or temperature sensor.
 
 On the top left, click on `0x1A00-1BFF Transmit PDO Mapping`.
@@ -211,22 +211,22 @@ On the bottom right, make sure `Have Callbacks` is checked
 On `subindex 0x01`, change the `value` to map to the desired `Manufacturer Specific` object by double-clicking on it and selecting the desired object from the dropdown list.
 Continue adding `PDO Transmit`s for all of your expecting outgoing messages, remembering to check `Have Callbacks`.
 
-###Other Settings
+### Other Settings
 You can use the Objdictedit to also change other CanOpen parameters, such as `0x1016 Consumer Heartbeat time`, where you can shorten or lengthen the interval between heartbeat messages.
 
-##Exporting .EDS, .OD, .CPP and .H files
+## Exporting .EDS, .OD, .CPP and .H files
 When you're done, be sure to save your new `.od` file (`File > Save` or `File Save As...`) and export your `.eds` (`File > Export to EDS file`).
 
 The most important step necessary for the Arduino sketch is the `Build Dictionary` option. This will generate the `.cpp` and `.h` files needed in the sketch. Do so, giving it a fitting name.
 
-##Including the .CPP and .H files in .INO sketch
+## Including the .CPP and .H files in .INO sketch
 If you don't have your own slave sketch already, open the `Arduino/slave_node_example` folder. Copy the `.cpp` and `.h` files your generated from objdictgen into this folder and delete or move the `slave_node_example.cpp` and `slave_node_example.h` files.
 > If you move these files, be sure to move them *out* of the sketch folder or any of its subfolders
 Then open `slave_example_node.ino` in the Arduino IDE.
 > All files and files in subfolders of the sketch folder will also open in Arduino IDE. If you change the filenames of your generated `.cpp` and `.h` files, you must therefore close the sketch and reopen the `.ino` to have the correct files for compilation. If you get compile errors, this is likely the cause.
 
-###Updating the sketch
-####Changing the includes
+### Updating the sketch
+#### Changing the includes
 The first step you must do is to change the includes to match the filename of your generated `.cpp` and `.h` files. Change the line:
 
 ```
@@ -238,11 +238,11 @@ To reflect the name you gave your generated `.h` file. For example:
 ```
 #include "my_new_slave_node.h" //generated using objdictedit.py
 ```
-####Write your callback functions
+#### Write your callback functions
 Using the exising callback functions `readSensorCallback` and `writeActuatorCallback` as a template, write your own callback functions. Give them descriptive names, making it clear which components they will be accessing. You're free to name the functions whatever you wish.
 > Received data is saved under the same variable as the name of your `Manufacturer Specific` object
 
-####Mapping callback functions
+#### Mapping callback functions
 In the `void setup()`, you must now map your callback functions to the corrosponding object indices and subindices, much like as is done in the example. The syntax is:
 
 ```
@@ -254,10 +254,10 @@ Where `index` is the index number of the Manufacturer Specific object you define
 
 In the example, these are enclosed in print statements, as these will return an error code if something went wrong (otherwise simply `0` if it was successful.
 
-###Final Steps
+### Final Steps
 Now simply compile the sketch and upload it to the Arduino and it should start sending it's heartbeat over the CANBUS network.
 
-##Preparing the master node
+## Preparing the master node
 
 > As explained in the "Editing a slave node .EDS" section, the master node cannot request or change the slave node's .EDS file at runtime. Therefore we need to make sure it has all necessary information beforehand. The major downside to this is that any changes made to a slave node or to the network must also be reflected in all of the corresponding files.
 > 
@@ -267,7 +267,7 @@ Now simply compile the sketch and upload it to the Arduino and it should start s
 > 
 > Our recommendation is to have some kind of system that makes it easy to find the ID of a node, such putting it filenames.
 
-###Generating the master OD/EDS with Networkedit
+### Generating the master OD/EDS with Networkedit
 Make sure you're in the `objdictgen` folder. If not, use the following command:
 
 ```
@@ -294,7 +294,7 @@ python2 objdictedit.py
 
 Go to `File > Open` and choose the `master.od` file we just created above. The go to `File > Export to EDS file`. Save this to the same folder as all of your other `.eds` files.
 
-###Editing the CanOpen Master Example
+### Editing the CanOpen Master Example
 First, make sure all of the `.eds` files of your master and slave nodes are in the same folder as the `canopen_master_example.py`. Then, open `canopen_master_example.py` in your favorite editor.
 
 Define the master and each slave node as demonstrated in the example.

@@ -2,7 +2,7 @@ from abc import ABC
 
 
 class NodeInput(ABC):
-    def __init__(self, value, var_name, node_name):
+    def __init__(self, value, node_var_name, node_name):
         ''' NodeInput Object used to change to state of the vehicle.
 
             value : any
@@ -15,7 +15,7 @@ class NodeInput(ABC):
                 Description what the node is functioning for.
 
         '''
-        self.var_name = var_name
+        self.node_var_name = node_var_name
         self.value = value
         self.node_name = node_name
         super().__init__()
@@ -39,29 +39,29 @@ class NodeInput(ABC):
 class DistanceNodeInput(NodeInput):
     # Enum 0
     # Distance as object distance
-    def __init__(self, distance: float, var_name: str, node_name: str):
-        super().__init__(distance, var_name, node_name)
+    def __init__(self, distance: float, node_var_name: str, node_name: str):
+        super().__init__(distance, node_var_name, node_name)
 
 
 class SteeringNodeInput(NodeInput):
     # Enum 1
-    def __init__(self, steering_angle: float, var_name: str, node_name: str):
-        super().__init__(steering_angle, var_name, node_name)
+    def __init__(self, steering_angle: float, node_var_name: str, node_name: str):
+        super().__init__(steering_angle, node_var_name, node_name)
 
 
 class LocalizationNodeInput(NodeInput):
     # Enum 2
-    def __init__(self, location: str, var_name: str, node_name: str):
-        super().__init__(location, var_name, node_name)
+    def __init__(self, location: str, node_var_name: str, node_name: str):
+        super().__init__(location, node_var_name, node_name)
 
 
 class EngineNodeInput(NodeInput):
     # Enum 3
-    def __init__(self, set_engine: bool, var_name: str, node_name: str):
-        super().__init__(set_engine, var_name, node_name)
+    def __init__(self, set_engine: bool, node_var_name: str, node_name: str):
+        super().__init__(set_engine, node_var_name, node_name)
 
 
 class TemperatureNodeInput(NodeInput):
     # Enum 4
-    def __init__(self, temperature: float, var_name: str, node_name: str):
-        super().__init__(temperature, var_name, node_name)
+    def __init__(self, temperature: float, node_var_name: str, node_name: str):
+        super().__init__(temperature, node_var_name, node_name)

@@ -6,24 +6,22 @@ routes = web.RouteTableDef()
 
 @routes.get('/allnodes')
 async def get_all_nodes(request):
-    ''' Receives a get request that asks for all nodes.
+    ''' Returns array with all nodes in json format.
 
-        Returns array with all nodes in json format.
-
-        Ex. returns
+        Eg. returns
         [{
             type : 'DistanceNode',
-            purpose : 'Front view object distance',
-            variables : {
+            node_name : 'Front view object distance',
+            variables : [
                 ...
-            }
+            ]
         },
         {
             type : 'SteeringNode',
-            purpose : 'Steering wheel',
-            variables : {
+            node_name : 'Steering wheel',
+            variables : [
                 ...
-            }
+            ]
         },
             ...
         ]
@@ -33,17 +31,15 @@ async def get_all_nodes(request):
 
 @routes.get('/node/{id}')
 async def get_node(request):
-    ''' Receives a get request that asks for a specific node with a certain id.
+    ''' Returns desired node information based on node ID.
 
         Parameters
-            id : id of a specified node expects number.
+            id : id of a node expects integer between 1-127 (not hex value).
 
-        Returns specified node in json format.
-
-        Ex. returns
+        Eg. returns
         {
             type : 'DistanceNode',
-            purpose : 'Front view object distance',
+            node_name : 'Front view object distance',
             variables : [
                 ...
             ]
@@ -54,16 +50,14 @@ async def get_node(request):
 
 @routes.get('/node/{id}/{var_name}')
 async def get_variable(request):
-    ''' Receives a get request that asks for a specific variable
-        of a specified node.
+    ''' Returns desired variable in json format.
 
         Parameters
-            id : id of a specified node expects number.
-            var_name: string of a specified variable name.
+            id : id of a specified node expects integer between 1-127
+                (not hex value).
+            var_name: name of the desired variable.
 
-        Returns specified variable in json format.
-
-        Ex. returns
+        Eg. returns
         {
             name: 'variable',
             index: '0x2000',
@@ -77,12 +71,13 @@ async def get_variable(request):
 
 @routes.post('/node/{id}/{var_name}')
 async def update_variable_value(request):
-    ''' Receives a post request that wants to update a value of specific variable
-        of a specified node.
+    ''' Receives a post request that wants to update a value of a variable.
+        Returns a message that says value is changed succesfully.
 
         Parameters:
-            id : id of a specified node expects number.
-            var_name: string of a specified variable name.
+            id : id of a specified node expects integer between 1-127
+                (not hex value).
+            var_name: name of the variable that needs to be changed.
 
         Request body:
             {
@@ -92,18 +87,15 @@ async def update_variable_value(request):
         Note: This post request has lower importance for us. Hopefully we
               are able to implement this.
 
-        Returns a message that says value is changed succesfully.
     '''
     pass
 
 
 @routes.get('/getloggingbuffer')
 async def get_logging_buffer(request):
-    ''' Receives a get request that asks for the current logging buffer.
+    ''' Returns the current logging buffer (raw messages) in json format.
 
-        Returns all raw can messages in json format.
-
-        Ex. returns
+        Eg. returns
         [
             {
                 timestamp: '21314313',

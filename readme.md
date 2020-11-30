@@ -1,5 +1,5 @@
 ﻿# CargoDash Usage Guide
-This document will help you to understand to make use of CargoDash. CargoDash is a diagnostics tool for developing autonomous vehicles and is written in Python code (version 3.8.5). For any questions please for free to create an issue.
+This document will help you to understand to make use of CargoDash. CargoDash is a diagnostics tool for developing autonomous vehicles and is written in Python code (version 3.8.5). For any questions please feel free to create an issue.
 
 ## Python Dependencies
 ```
@@ -24,25 +24,23 @@ This document will help you to understand to make use of CargoDash. CargoDash is
 ```  
 
 ## Introduction
-CargoDash is a tool that listen to incoming messages and sets the values of these messages into user-defined nodes. These user-defined nodes can be requested with CargoDash's Http-server. Besides this it logs all raw incoming messages into a buffered logger. 
+CargoDash is a tool that listens to incoming messages and sets the values of these messages into user-defined nodes. These user-defined nodes can be requested with CargoDash's HTTP-server. Besides this, it logs all raw incoming messages into a buffered logger. 
 
-For now, CargoDash works only with CanOpen messages but with the architecture of CargoDash you should be able to add your desired message type. 
+For now, CargoDash works only with CanOpen messages but with the architecture of CargoDash, you should be able to add your desired message protocol. 
 
 The logger can be requested to log all messages from the buffer on command. For example, you can request the buffer on a dangerous event or when the user wants it.
 
-![CargoDash Architecture](img/api_cargodash_v5.png "CargoDash Architecture")
-
 ## Our usage
-We created CargoDash to listen to a CanOpen network and use it for the Smarterdam project. The Smarterdam project is funded by Rotterdam University of Applied Sciences. CargoDash is able to track all incoming can messages and we are able to give more meaning to messages that have been send and received.     
+We created CargoDash to listen to a CanOpen network and use it for the Smarterdam project. The Smarterdam project is funded by Rotterdam University of Applied Sciences. CargoDash is able to track all incoming CanOpen messages and we are able to give more meaning to messages that have been send and received.     
 
 ## Using the configuration file for CanOpen (config.yaml)
 
-Inside the code block below you can read a detailed description which configurations that CargoDash uses. In general, we prefer that CargoDash can be configured from one file instead of multiple configuration places. This makes CargoDash more user-friendly. 
+Inside the code block below you can read a detailed description of which configurations that CargoDash uses. In general, we prefer that CargoDash can be configured from one file such as the config.yaml file instead of multiple configuration places. This makes CargoDash more user-friendly and centralized. 
 ```yaml
-    # canopen_vcan is a configuration and is a configuration example for CanOpen.
+    # canopen_vcan is a configuration and is a configuration example for the CanOpen protocol.
     # With a similar pattern you can create multiple canopen configurations.
     # For now we use canopen_vcan as example. All these paramters inside canopen_vcan 
-    # are used for CargoDash's implementation.
+    # are used for CargoDash's CanOpen implementation.
     canopen_vcan:
         
         # Sets the bustype of the CanOpen network. 
@@ -84,10 +82,13 @@ Inside the code block below you can read a detailed description which configurat
 ```
 ## Extending CargoDash Communication Possibilities
 
-For now CargoDash is only able to work with CanOpen but it has potential to work with more communication protocols. If you want to add a communication protocol for CargoDash you should add a new interpreter and listener that is following your protocol. You can easily create a new listener class which uses the same methods as the abstract listener class. The same goes for the interpreter.
+For now, CargoDash is only able to work with the CanOpen protocol but it has the potential to work with more communication protocols. If you want to add a communication protocol then you should add a new interpreter and a new listener. You can easily create a new listener class that uses the same methods as the abstract listener class. The same goes for the interpreter. It's important that you create nodes from the NodeFactory inside your interpreter. The NodeFactory class creates 'Node Input' objects which can be used to change the vehicle's state. In the diagram below you can have an understanding of CargoDash internal class interaction works.
+
+
+![CargoDash Architecture](img/api_cargodash_v6.png "CargoDash Architecture")
 
 ## Adding Nodes
-At CargoDash we already implemented certain standard nodes that exists in a vehicle such as SteeringNode, temperatureNode and more. But if you want to add a custom node you can add it by changing some files. You can do this like the changes described below for the LidarNode.
+At CargoDash we already implemented certain standard nodes that exist in a vehicle such as SteeringNode, TemperatureNode, and more. But if you want to add a custom node you can add it by changing some files. You can do this like the changes described below for the LidarNode.
 
 ### node_input_factory/node_input_enums.py
 

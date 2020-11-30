@@ -26,7 +26,7 @@ class CanOpenListener(Listener):
 
         super().__init__(config)
         self.observers = array([])
-        self.node_purposes = array([])
+        self.nodes = array([])
         self.config_type = config_type
         self.network = self.connect_to_network()
         self._add_nodes(self.config[self.config_type]['nodes'])
@@ -114,15 +114,17 @@ class CanOpenListener(Listener):
 
     def _add_nodes(self, nodes):
         for i in range(len(nodes)):
-            self.node_purposes = append(
-                self.node_purposes, nodes[i]['node_purpose'])
+            self.nodes = append(
+                self.nodes, nodes[i]['node_properties'])
             # Either adds local or remote node bases on config for each node
             if(nodes[i]['local']):
                 # Create a local node
-                self.network.create_node(i + 1, nodes[i]['eds_location'])
+                self.network.create_node(nodes[i]['node_properties']['id'],
+                                         nodes[i]['eds_location'])
             else:
                 # Add a remote node
-                self.network.add_node(i + 1, nodes[i]['eds_location'])
+                self.network.add_node(nodes[i]['node_properties']['id'],
+                                      nodes[i]['eds_location'])
 
     def inform_interpreter(self, sdo_value, sdo_name, node_id):
         ''' Informs the interpreter with a changed SDO.
@@ -138,9 +140,10 @@ class CanOpenListener(Listener):
 
             Returns void.
         '''
-
+        # Iterates through self.nodes to find correct node with id.
+        node = [x for x in self.nodes if x['id'] == node_id][0]
         self.interpreter.inform_interpreter(sdo_value, sdo_name,
-                                            self.node_purposes[node_id - 1])
+                                            node)
 
     def set_interpreter(self, interpreter):
         ''' Set the interpreter where CanOpenListener can send messages to.

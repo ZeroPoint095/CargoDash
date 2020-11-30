@@ -7,6 +7,7 @@ This document will help you to understand to make use of CargoDash. CargoDash is
     can v3.3.4
     canopen v1.1.0
     numpy v1.19.4
+    pyyaml v5.3.1
 ```  
 
 ## Introduction
@@ -109,13 +110,35 @@ Inside the NodeInputFactory add a new method.
         return LidarNodeInput(distance,
                               name, node_purpose_name)
 ```
+And don't forget to include LidarNodeInput at the NodeInputFactory.
 **interpreter/can_open_interpreter.py:**
+At CanOpenInterpreter you need to add the node check between the last elif and else.
+You should make it similar like this.
 ```python
+    ...
+    elif(NodeType.LidarNode == node_type):
+        n_input = self.node_input_factory.create_lidar_node_input(
+            unpack('h', value)[0], name, node_name)
     ...
 ```
+
 **vehicle_state/vehicle_classes.py:**
+At the constructor of ConfigureableVehicle inside vehicle_classes.py, you should add a 
+new property like:
+```python
+    self.lidar_nodes = array([])
+```
+then at private method 
+At last at the vehicle classes you should add.
 ```python
     ...
+    class LidarSensor(Node):
+        def __init__(self, name):
+            self.distance = 0
+            super().__init__(name)
+
+        def set_distance(self, distance):
+            self.distance = distance
 ```
 
 ## API

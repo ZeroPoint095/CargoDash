@@ -39,7 +39,7 @@ In our application, we created a network of Arduino's that communicate with a Ra
 
 Inside the code block below you can read a detailed description of which configurations that CargoDash uses. In general, we prefer that CargoDash can be configured from one file such as the config.yaml file instead of multiple configuration places. This makes CargoDash more user-friendly and centralized. 
 ```yaml
-    # canopen_vcan is a configuration and is a configuration example for the CanOpen protocol.
+    # canopen_vcan is a configuration example for the CanOpen protocol.
     # With a similar pattern you can create multiple canopen configurations.
     # For now we use canopen_vcan as example. All these paramters inside canopen_vcan 
     # are used for CargoDash's CanOpen implementation.
@@ -54,11 +54,11 @@ Inside the code block below you can read a detailed description of which configu
         # Sets the bitrate of CanOpen the network
         bitrate: 500000 
         
-        # Sets the nodes which are existing inside the network.
+        # Sets the nodes which exist inside the network.
         # This is done in an array with object that contain information needed for CargoDash.
         # Every object needs to contain these attributes
         #       local : sets if the node is either remote or local
-        #       eds_location : sets the location of the needed eds file of the node
+        #       eds_location : path to the eds file of the node
         #       node_purpose : object containing name and type of node:
         #                      name: Short description of the node
         #                      type: integer that should reflect the types of the nodes 
@@ -92,17 +92,18 @@ For now, CargoDash is only able to work with the CanOpen protocol but it has the
 ## Adding Nodes
 In CargoDash we already implemented certain standard nodes that would exist in a real vehicle such as SteeringNode, TemperatureNode, and more. But if you want to add your own, custom node you can add it by changing some files. You can do this using the changes described below using a LidarNode as an example.
 
-### node_input_factory/node_input_enums.py
-
 Just add an enum to the enums list.
 ```python
+    # Add to: node_input_factory/node_input_enums.py
+
     ...
     LidarNode=5
 ```
-### node_input_factory/node_input_classes.py
 
 At the end of the file add the new class *LidarNodeInput*.
 ```python
+    # Add to: node_input_factory/node_input_classes.py
+
     ...
     class LidarNodeInput(NodeInput):
     # Enum 5
@@ -110,10 +111,11 @@ At the end of the file add the new class *LidarNodeInput*.
         super().__init__(distance, name, node_name)
 
 ```
-### node_input_factory/node_input_factory.py
 
 Inside the class *NodeInputFactory* add a new method.
 ```python
+    # Add to: node_input_factory/node_input_factory.py
+
     ...
     def create_lidar_node_input(self, distance: float,
                                    name: str, node_name: str):
@@ -122,11 +124,11 @@ Inside the class *NodeInputFactory* add a new method.
 ```
 And don't forget to import *LidarNodeInput* at the *node_input_factory.py* file.
 
-### interpreter/can_open_interpreter.py
-
 In class *CanOpenInterpreter* you need to add the node check between the last elif and else.
 You should make it similar like this.
 ```python
+    # Change at: interpreter/can_open_interpreter.py
+
     ...
     elif(NodeType.LidarNode == node_type):
         n_input = self.node_input_factory.create_lidar_node_input(
@@ -134,14 +136,16 @@ You should make it similar like this.
     ...
 ```
 
-### vehicle_state/vehicle_classes.py
-
 In the constructor of class *ConfigureableVehicle* inside the file *vehicle_classes.py*, you should add a new property like:
 ```python
+    # Add to: vehicle_state/vehicle_classes.py
+
     self.lidar_nodes = array([])
 ```
 At the end of the file you should add:
 ```python
+    # Add to: vehicle_state/vehicle_classes.py
+
     ...
     class LidarSensor(Node):
         def __init__(self, name):
@@ -153,6 +157,8 @@ At the end of the file you should add:
 ```
 Then in private method *_add_node_to_vehicle* add:
 ```python
+    # Add to: vehicle_state/vehicle_classes.py
+
     ...
     elif(node_type == NodeType.LidarNode):
         if(not self._is_node_existing(self.lidar_nodes,
@@ -164,6 +170,8 @@ Then in private method *_add_node_to_vehicle* add:
 ```
 Lastly you should add in method *edit_vehicle_state*:
 ```python
+    # Add to: vehicle_state/vehicle_classes.py
+    
     ...
     elif(input_type == LidarNodeInput):
         node = self._get_node(self.lidar_nodes, node_input)

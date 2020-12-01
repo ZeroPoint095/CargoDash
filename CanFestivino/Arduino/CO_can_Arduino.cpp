@@ -5,7 +5,7 @@
 
 // TODO: add rx and tx queue to can driver and make interrupt driven
 // TODO: make CS selectable via template
-MCP_CAN CAN(7); // TODO add CS to CO_Init call!
+MCP_CAN CAN(10); // TODO add CS to CO_Init call!
 
 UNS8 canSend(Message *m) {
     if (CAN.sendMsgBuf((uint32_t)m->cob_id, 0, m->rtr, m->len, m->data) == CAN_ALL_TX_BUSY) {

@@ -33,7 +33,7 @@ The buffered logger can be requested to log all messages from the buffer on comm
 ## Our usage
 We created CargoDash to listen to a CanOpen network and use it for the Smarterdam project. The Smarterdam project is funded by Rotterdam University of Applied Sciences. CargoDash is able to track all incoming CanOpen messages and we are able to give more meaning to messages that have been send and received.
 
-In our application, we created a network of Arduino's that are communicating with a Raspberry Pi that is running the CargoDash code. For the communication between the Arduino's and the Raspberry Pi, we created a can bus network. All these micro-controllers are communicating with the CanOpen protocol. For the Arduino's to communicate in CanOpen, we forked [jgeisler0303's](https://github.com/jgeisler0303/CANFestivino) repository. We fixed some bugs and adapted it more to our use case. Our repository can be found [here](https://github.com/ZeroPoint095/CANFestivino).
+In our application, we created a network of Arduino's that communicate with a Raspberry Pi running the CargoDash code. For the communication between the Arduino's and the Raspberry Pi, we created a can bus network. All these micro-controllers are communicating with the CanOpen protocol. For the Arduino's to communicate in CanOpen, we forked [jgeisler0303's](https://github.com/jgeisler0303/CANFestivino) repository. We fixed some bugs and adapted it more to our use case. Our repository can be found [here](https://github.com/ZeroPoint095/CANFestivino).
 
 ## Using the configuration file for CanOpen (config.yaml)
 

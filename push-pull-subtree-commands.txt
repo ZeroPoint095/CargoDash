@@ -1,5 +1,5 @@
 git subtree pull --prefix {local directory of subtree} {remote repo URL} {remote branch}
-git subtree pull  --prefix CanFestivino https://github.com/ZeroPoint095/CANFestivino.git master 
+git subtree pull  --prefix CanFestivino https://github.com/ZeroPoint095/CANFestivino.git master --squash
 
 git subtree push --prefix {local directory of subtree} {remote repo URL} {remote branch}
-git subtree push  --prefix CanFestivino https://github.com/ZeroPoint095/CANFestivino.git /feature/[feature name]
+git subtree push  --prefix CanFestivino https://github.com/ZeroPoint095/CANFestivino.git /feature/[feature name] --squash

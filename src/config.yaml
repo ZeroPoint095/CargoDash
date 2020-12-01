@@ -1,11 +1,25 @@
+canopen_example:
+    bustype: socketcan
+    channel: can0
+    bitrate: 500000
+    nodes: [{local: false, eds_location: 'eds_files/slave_node_example.eds', node_properties: {id: 5,
+        name: 'Front view object distance', type: 0}}]
+    max_speed_in_ms: 3
+    raw_can_data_logging: false
+
 canopen_vcan:
     bustype: socketcan
     channel: vcan0
     bitrate: 500000
-    nodes: [{local: false, eds_location: 'eds_files/Arduino1.eds', node_purpose: {name: 'Front view object distance'
-    , type: 0}}]
+    nodes: [{local: false, eds_location: 'eds_files/Arduino1.eds', node_properties: {id: 5,
+        name: 'Front view object distance', type: 0}}]
     max_speed_in_ms: 3
-    raw_can_data_logging: false
+    raw_can_data_logging: {
+        enabled: true,
+        # The value is the amount in raw can messages.
+        # Implementation saves raw can messages up until buffer's value. 
+        buffer: 1024
+    }
 
 canopen_serial:
     bustype: slcan
@@ -13,5 +27,8 @@ canopen_serial:
     bitrate: 500000
     nodes: []
     max_speed_in_ms: 3
-    raw_can_data_logging: false
+    raw_can_data_logging: {
+        enabled: true,
+        buffer: 1024
+    }
     #TODO: whatever needs to be in "nodes" field

@@ -4,11 +4,11 @@ FileVersion=1
 FileRevision=1
 EDSVersion=4.0
 Description=Example node with a sensor and actuator
-CreationTime=11:40AM
-CreationDate=11-13-2020
+CreationTime=03:44PM
+CreationDate=11-16-2020
 CreatedBy=CANFestival
-ModificationTime=11:40AM
-ModificationDate=11-13-2020
+ModificationTime=03:44PM
+ModificationDate=11-16-2020
 ModifiedBy=CANFestival
 
 [DeviceInfo]

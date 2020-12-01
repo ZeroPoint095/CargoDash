@@ -28,7 +28,7 @@ CargoDash is a tool that listens to incoming messages and sets the values of the
 
 For now, CargoDash works only with CanOpen messages but with the architecture of CargoDash, you should be able to add your desired message protocol.
 
-The buffered logger can be requested to log all messages from the buffer on command. The buffer is circular and records the messages continuously. When the buffer is full then it continues by overwriting the oldest messages.  For example, when the buffer just filled in index 1024 and it has a shape from index 0 to index 1024 then it starts over again from index 0. The buffer gets filled from 0 to 1024 again. The logger has many useful purposes. You can request the buffer on a dangerous event or just when a user wants to see the log.
+The buffered logger can be requested to log all messages from the buffer on command. The buffer is circular and records the messages continuously. When the buffer is full then it continues by overwriting the oldest messages.  For example, when the buffer just filled in index 1024 and it has a range from index 0 to index 1024 then it starts over again from index 0. The buffer gets filled from 0 to 1024 again. The logger has many useful purposes. You can request the buffer on a dangerous event or just when a user wants to see the log.
 
 ## Our usage
 We created CargoDash to listen to a CanOpen network and use it for the Smarterdam project. The Smarterdam project is funded by Rotterdam University of Applied Sciences. CargoDash is able to track all incoming CanOpen messages and we are able to give more meaning to messages that have been send and received.

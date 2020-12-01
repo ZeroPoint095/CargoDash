@@ -26,12 +26,14 @@ This document will help you to understand to make use of CargoDash. CargoDash is
 ## Introduction
 CargoDash is a tool that listens to incoming messages and sets the values of these messages into user-defined nodes. These user-defined nodes can be requested with CargoDash's HTTP-server. Besides this, it logs all raw incoming messages into a buffered logger. 
 
-For now, CargoDash works only with CanOpen messages but with the architecture of CargoDash, you should be able to add your desired message protocol. 
+For now, CargoDash works only with CanOpen messages but with the architecture of CargoDash, you should be able to add your desired message protocol.
 
-The logger can be requested to log all messages from the buffer on command. For example, you can request the buffer on a dangerous event or when the user wants it.
+The buffered logger can be requested to log all messages from the buffer on command. The buffer is circular and records the messages continuously. When the buffer is full then it continues by overwriting the oldest messages.  For example, when the buffer just filled in index 1024 and it has a shape from index 0 to index 1024 then it starts over again from index 0. The buffer gets filled from 0 to 1024 again. The logger has many useful purposes. You can request the buffer on a dangerous event or just when a user wants to see the log.
 
 ## Our usage
-We created CargoDash to listen to a CanOpen network and use it for the Smarterdam project. The Smarterdam project is funded by Rotterdam University of Applied Sciences. CargoDash is able to track all incoming CanOpen messages and we are able to give more meaning to messages that have been send and received.     
+We created CargoDash to listen to a CanOpen network and use it for the Smarterdam project. The Smarterdam project is funded by Rotterdam University of Applied Sciences. CargoDash is able to track all incoming CanOpen messages and we are able to give more meaning to messages that have been send and received.
+
+In our application, we created a network of Arduino's that are communicating with a Raspberry Pi that is running the CargoDash code. For the communication between the Arduino's and the Raspberry Pi, we created a can bus network. All these micro-controllers are communicating with the CanOpen protocol. For the Arduino's to communicate in CanOpen, we forked [jgeisler0303's](https://github.com/jgeisler0303/CANFestivino) repository. We fixed some bugs and adapted it more to our use case. Our repository can be found [here](https://github.com/ZeroPoint095/CANFestivino).
 
 ## Using the configuration file for CanOpen (config.yaml)
 
@@ -88,7 +90,7 @@ For now, CargoDash is only able to work with the CanOpen protocol but it has the
 ![CargoDash Architecture](img/api_cargodash_v6.png "CargoDash Architecture")
 
 ## Adding Nodes
-At CargoDash we already implemented certain standard nodes that exist in a vehicle such as SteeringNode, TemperatureNode, and more. But if you want to add a custom node you can add it by changing some files. You can do this like the changes described below for the LidarNode.
+In CargoDash we already implemented certain standard nodes that would exist in a real vehicle such as SteeringNode, TemperatureNode, and more. But if you want to add your own, custom node you can add it by changing some files. You can do this using the changes described below using a LidarNode as an example.
 
 ### node_input_factory/node_input_enums.py
 
@@ -122,7 +124,7 @@ And don't forget to import *LidarNodeInput* at the *node_input_factory.py* file.
 
 ### interpreter/can_open_interpreter.py
 
-At class *CanOpenInterpreter* you need to add the node check between the last elif and else.
+In class *CanOpenInterpreter* you need to add the node check between the last elif and else.
 You should make it similar like this.
 ```python
     ...
@@ -134,7 +136,7 @@ You should make it similar like this.
 
 ### vehicle_state/vehicle_classes.py
 
-At the constructor of class *ConfigureableVehicle* inside the file *vehicle_classes.py*, you should add a new property like:
+In the constructor of class *ConfigureableVehicle* inside the file *vehicle_classes.py*, you should add a new property like:
 ```python
     self.lidar_nodes = array([])
 ```
@@ -149,7 +151,7 @@ At the end of the file you should add:
         def set_distance(self, distance):
             self.distance = distance
 ```
-Then at private method *_add_node_to_vehicle* add:
+Then in private method *_add_node_to_vehicle* add:
 ```python
     ...
     elif(node_type == NodeType.LidarNode):
@@ -160,7 +162,7 @@ Then at private method *_add_node_to_vehicle* add:
                 self.distance_nodes, new_node)
     ...
 ```
-Lastly you should add at method *edit_vehicle_state*:
+Lastly you should add in method *edit_vehicle_state*:
 ```python
     ...
     elif(input_type == LidarNodeInput):

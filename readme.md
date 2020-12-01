@@ -1,5 +1,5 @@
 ﻿# CargoDash Usage Guide
-This document will help you to understand to make use of CargoDash. CargoDash is a diagnostics tool for developing autonomous vehicles and is written in Python code (version 3.8.5). For any questions please feel free to create an issue.
+This document will help you to understand how to make use of CargoDash. CargoDash is a diagnostics tool for developing autonomous vehicles and is written in Python code (version 3.8.5). For any questions please feel free to create an issue.
 
 ## Python Dependencies
 ```

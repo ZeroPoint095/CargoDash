@@ -27,7 +27,7 @@ However, the CAN transceiver chip requires 5V, which is supplied via the VCC1 pi
 
 On the Arduino Uno, it's okay to supply 5V to both VCC and VCC1.
 
-\#TODO add wiring diagram
+![Wiring Guide](canbus_example_bb.jpg)
 
 ## Raspberry Setup
 ### CANBUS Setup

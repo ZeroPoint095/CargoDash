@@ -18,10 +18,10 @@ class MeasuringSlaveNode:
             self.config = yaml.safe_load(ymlfile)
         # local node
         self.connectToNetwork(canopen.Network())
-        self.network.create_node(1, '../eds_files/Arduino1.eds')
+        self.network.create_node(5, '../eds_files/Arduino1.eds')
         while True:
             sleep(1)
-            print(self.network[1].sdo[0x2000].phys)
+            print(self.network[5].sdo[0x2000].phys)
             self.network.sync.transmit()
 
     def connectToNetwork(self, network):

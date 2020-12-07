@@ -10,7 +10,10 @@ canopen_example:
         enabled: true,
         # The value is the amount in raw can messages.
         # Implementation saves raw can messages up until buffer's value. 
-        buffer: 1024
+        buffer: 1024,
+        # At every n-th message update shared memory
+        update_shm: 100
+
     }
 
 canopen_vcan:
@@ -24,7 +27,9 @@ canopen_vcan:
         enabled: true,
         # The value is the amount in raw can messages.
         # Implementation saves raw can messages up until buffer's value. 
-        buffer: 1024
+        buffer: 1024,
+        # At every n-th message update shared memory
+        update_shm: 100
     }
 
 canopen_serial:
@@ -35,6 +40,8 @@ canopen_serial:
     max_speed_in_ms: 3
     raw_can_data_logging: {
         enabled: true,
-        buffer: 1024
+        buffer: 1024,
+        # At every n-th message update shared memory
+        update_shm: 100
     }
     #TODO: whatever needs to be in "nodes" field

@@ -20,6 +20,10 @@ class WheelPosition(Enum):
 
 
 class Node(ABC):
+    ''' Node is generic sensor/actuator that can be listened.
+        A node can measure distances or can track the current
+        steering angle.
+    '''
     def __init__(self, name):
         # Name of the node itself.
         self.id = None
@@ -29,6 +33,18 @@ class Node(ABC):
         self.variables = []
 
     def update_variable_list(self, name, var_dict):
+        ''' Updates the variable list of the node.
+            Can either add a variable or update a variables
+            value.
+
+            name: str
+                The name of the variable
+            var_dict: dict
+                The dictionary containing all information around the variable
+                including the name, the value, the index etc.
+
+            Returns void.
+        '''
         updated = False
         for variable in self.variables:
             if(variable['node_var_name'] == name):
@@ -138,24 +154,32 @@ class ConfigureableVehicle(Vehicle):
         self.compressed_nodes = self._compress_nodes(self.distance_nodes,
                                                      self.temperature_nodes,
                                                      self.engine_nodes)
+        # Closes previous shared memory block.
         if(self.shm is not None):
             self.shm.shm.close()
             self.shm.shm.unlink()
         try:
+            # Tries to add new memory block with information
+            # containing the nodes.
             self.shm = shared_memory.ShareableList([self.compressed_nodes],
                                                    name='shm_cargodash')
         except FileExistsError:
-            tempshm = shared_memory.ShareableList(name='shm_cargodash')
-            tempshm.shm.close()
-            tempshm.shm.unlink()
+            # Old shared memory block is still open and needs to 
+            # be closed.
+            temp_shm = shared_memory.ShareableList(name='shm_cargodash')
+            temp_shm.shm.close()
+            temp_shm.shm.unlink()
+            # Now able to add wanted shared memory block.
             self.shm = shared_memory.ShareableList([self.compressed_nodes],
                                                    name='shm_cargodash')
 
     def _compress_nodes(self, *node_lists):
         dict_list = []
+        # Fetches from all information from the node_lists
         for node_list in node_lists:
             for node in node_list:
                 dict_list.append(node.__dict__)
+        # Compresses the data
         return zl.compress(str(dict_list).encode('UTF-8'), 2)
 
     def _add_node_to_vehicle(self, node_properties):

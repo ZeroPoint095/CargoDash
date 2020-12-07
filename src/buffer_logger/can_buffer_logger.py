@@ -13,10 +13,11 @@ class CanBufferLogger(BufferLogger):
 
     def __init__(self, config, config_type):
         super().__init__(config, config_type)
-        can_logging = self.config[self.config_type]['raw_can_data_logging']
-        if(can_logging['enabled']):
+        self.can_logging = self.config[
+            self.config_type]['raw_can_data_logging']
+        if(self.can_logging['enabled']):
             self.shm = None
-            self.can_logging_buffer = can_logging['buffer']
+            self.can_logging_buffer = self.can_logging['buffer']
             self.buffered_data = empty([self.can_logging_buffer],
                                        dtype=can.Message)
             set_printoptions(threshold=self.can_logging_buffer)
@@ -54,23 +55,27 @@ class CanBufferLogger(BufferLogger):
                 self.buffered_data[index] = can_msg
 
                 index = (index + 1) % self.can_logging_buffer
-
-                if (index % 100 == 0):
+                # At every n-th index update shared memory for HTTP server
+                if (index % self.can_logging['update_shm'] == 0):
+                    # First close open shared memory
                     if(self.shm is not None):
                         self.shm.shm.close()
                         self.shm.shm.unlink()
-                    temp_data = zl.compress(
+                    # Compresses buffered data
+                    temp_buff_data = zl.compress(
                         array2string(self.buffered_data).encode('UTF-8'), 2)
                     try:
+                        # Try to share buffered data
                         self.shm = shared_memory.ShareableList(
-                            [temp_data], name='shm_buff_data')
+                            [temp_buff_data], name='shm_buff_data')
                     except FileExistsError:
-                        tempshm = shared_memory.ShareableList(
+                        # Logs where still saved so needs to close first
+                        temp_shm = shared_memory.ShareableList(
                             name='shm_buff_data')
-                        tempshm.shm.close()
-                        tempshm.shm.unlink()
+                        temp_shm.shm.close()
+                        temp_shm.shm.unlink()
                         self.shm = shared_memory.ShareableList(
-                            [temp_data], name='shm_buff_data')
+                            [temp_buff_data], name='shm_buff_data')
 
         except KeyboardInterrupt:
             self._closing_async_listener()

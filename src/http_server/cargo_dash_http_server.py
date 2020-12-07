@@ -8,6 +8,10 @@ routes = web.RouteTableDef()
 
 
 def uncompress_logging_information():
+    ''' Uncompresses the shared logging information.
+
+        Returns the logs as string.
+    '''
     try:
         shared_logs = shared_memory.ShareableList(name='shm_buff_data')
     except FileNotFoundError:
@@ -17,6 +21,10 @@ def uncompress_logging_information():
 
 
 def uncompress_nodes_information():
+    ''' Uncompresses the shared node information.
+
+        Return the nodes as json.
+    '''
     try:
         shared_dict = shared_memory.ShareableList(name='shm_cargodash')
     except FileNotFoundError:

@@ -33,7 +33,7 @@ class Node(ABC):
         for variable in self.variables:
             if(variable['node_var_name'] == name):
                 updated = True
-                variable = var_dict
+                variable['value'] = var_dict['value']
         if(not updated):
             self.variables.append(var_dict)
 

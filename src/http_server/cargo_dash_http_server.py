@@ -7,6 +7,15 @@ from multiprocessing import shared_memory
 routes = web.RouteTableDef()
 
 
+def uncompress_logging_information():
+    try:
+        shared_logs = shared_memory.ShareableList(name='shm_buff_data')
+    except FileNotFoundError:
+        return {'message': 'Cannot fetch buffered logger'}
+    all_logs = zl.decompress(shared_logs[0]).decode('UTF-8')
+    return all_logs
+
+
 def uncompress_nodes_information():
     try:
         shared_dict = shared_memory.ShareableList(name='shm_cargodash')
@@ -131,10 +140,10 @@ async def update_variable_value(request):
 
 @routes.get('/getloggingbuffer')
 async def get_logging_buffer(request):
-    ''' Returns the current logging buffer (raw messages) in json format.
+    ''' Returns the current logging buffer (raw messages) in as a string.
 
         Eg. returns
-        [
+        "[
             {
                 timestamp: '21314313',
                 ID: '123',
@@ -144,10 +153,10 @@ async def get_logging_buffer(request):
             {
                 ...
             }
-        ]
+        ]"
     '''
-    # TODO: fetch logging
-    pass
+
+    return web.json_response(uncompress_logging_information())
 
 
 app = web.Application()

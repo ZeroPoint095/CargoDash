@@ -138,19 +138,25 @@ class ConfigureableVehicle(Vehicle):
         self.compressed_nodes = self._compress_nodes(self.distance_nodes,
                                                      self.temperature_nodes,
                                                      self.engine_nodes)
-        print(self.distance_nodes[0].__dict__)
         if(self.shm is not None):
             self.shm.shm.close()
             self.shm.shm.unlink()
-        self.shm = shared_memory.ShareableList([self.compressed_nodes],
-                                               name='shm_cargodash')
+        try:
+            self.shm = shared_memory.ShareableList([self.compressed_nodes],
+                                                   name='shm_cargodash')
+        except FileExistsError:
+            tempshm = shared_memory.ShareableList(name='shm_cargodash')
+            tempshm.shm.close()
+            tempshm.shm.unlink()
+            self.shm = shared_memory.ShareableList([self.compressed_nodes],
+                                                   name='shm_cargodash')
 
     def _compress_nodes(self, *node_lists):
         dict_list = []
         for node_list in node_lists:
             for node in node_list:
                 dict_list.append(node.__dict__)
-        return zl.compress(str(dict_list).encode('utf-8'), 2)
+        return zl.compress(str(dict_list).encode('UTF-8'), 2)
 
     def _add_node_to_vehicle(self, node_properties):
         # Automatically add nodes that are defined in the

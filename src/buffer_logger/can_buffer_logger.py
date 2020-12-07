@@ -1,5 +1,7 @@
 import can
 import asyncio
+import zlib as zl
+from multiprocessing import shared_memory
 from buffer_logger.buffer_logger import BufferLogger
 from numpy import array2string, empty, set_printoptions
 from datetime import datetime
@@ -13,6 +15,7 @@ class CanBufferLogger(BufferLogger):
         super().__init__(config, config_type)
         can_logging = self.config[self.config_type]['raw_can_data_logging']
         if(can_logging['enabled']):
+            self.shm = None
             self.can_logging_buffer = can_logging['buffer']
             self.buffered_data = empty([self.can_logging_buffer],
                                        dtype=can.Message)
@@ -45,11 +48,30 @@ class CanBufferLogger(BufferLogger):
         try:
             while True:
                 can_msg = await self.reader.get_message()
-                # Sleeps 0.1 seconds so doesn't try to read all messages 
+                # Sleeps 0.1 seconds so doesn't try to read all messages
                 # at once.
                 await asyncio.sleep(0.1)
                 self.buffered_data[index] = can_msg
+
                 index = (index + 1) % self.can_logging_buffer
+
+                if (index % 100 == 0):
+                    if(self.shm is not None):
+                        self.shm.shm.close()
+                        self.shm.shm.unlink()
+                    temp_data = zl.compress(
+                        array2string(self.buffered_data).encode('UTF-8'), 2)
+                    try:
+                        self.shm = shared_memory.ShareableList(
+                            [temp_data], name='shm_buff_data')
+                    except FileExistsError:
+                        tempshm = shared_memory.ShareableList(
+                            name='shm_buff_data')
+                        tempshm.shm.close()
+                        tempshm.shm.unlink()
+                        self.shm = shared_memory.ShareableList(
+                            [temp_data], name='shm_buff_data')
+
         except KeyboardInterrupt:
             self._closing_async_listener()
 

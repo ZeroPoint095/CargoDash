@@ -1,7 +1,21 @@
 import asyncio
+import json
+import zlib as zl
 from aiohttp import web
+from multiprocessing import shared_memory
 
 routes = web.RouteTableDef()
+
+
+def uncompress_nodes_information():
+    try:
+        shared_dict = shared_memory.ShareableList(name='shm_cargodash')
+    except FileNotFoundError:
+        return uncompress_nodes_information()
+    all_nodes = zl.decompress(shared_dict[0]).decode('UTF-8')
+    all_nodes = '"'.join(all_nodes.split("'"))
+    nodes_as_json = json.loads(all_nodes)
+    return nodes_as_json
 
 
 @routes.get('/allnodes')
@@ -26,7 +40,7 @@ async def get_all_nodes(request):
             ...
         ]
     '''
-    pass
+    return web.json_response(uncompress_nodes_information())
 
 
 @routes.get('/node/{id}')
@@ -45,7 +59,15 @@ async def get_node(request):
             ]
         }
     '''
-    pass
+    all_nodes = uncompress_nodes_information()
+    try:
+        node_id = int(request.match_info['id'])
+    except ValueError:
+        return web.json_response({'message': 'Node doesn\'t exist!'})
+    if(node_id >= 0 and node_id < len(all_nodes)):
+        return web.json_response(all_nodes[node_id])
+    else:
+        return web.json_response({'message': 'Node doesn\'t exist!'})
 
 
 @routes.get('/node/{id}/{var_name}')
@@ -66,7 +88,22 @@ async def get_variable(request):
         }
 
     '''
-    pass
+    all_nodes = uncompress_nodes_information()
+    try:
+        node_id = int(request.match_info['id'])
+        var_name = request.match_info['var_name']
+    except ValueError:
+        return web.json_response({'message': 'Variable doesn\'t exist!'})
+    if(node_id >= 0 and node_id < len(all_nodes)):
+        found = False
+        for variable in all_nodes[node_id]['variables']:
+            if(variable['node_var_name'] == var_name):
+                found = True
+                return web.json_response(variable)
+        if(not found):
+            return web.json_response({'message': 'Variable doesn\'t exist!'})
+    else:
+        return web.json_response({'message': 'Variable doesn\'t exist!'})
 
 
 @routes.post('/node/{id}/{var_name}')
@@ -88,6 +125,7 @@ async def update_variable_value(request):
               are able to implement this.
 
     '''
+    # TODO: update values of variables
     pass
 
 
@@ -108,6 +146,7 @@ async def get_logging_buffer(request):
             }
         ]
     '''
+    # TODO: fetch logging
     pass
 
 

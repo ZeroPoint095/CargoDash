@@ -21,7 +21,6 @@ class MeasuringSlaveNode:
         self.network.create_node(5, '../eds_files/Arduino1.eds')
         while True:
             sleep(1)
-            print(self.network[5].sdo[0x2000].phys)
             self.network.sync.transmit()
 
     def connectToNetwork(self, network):

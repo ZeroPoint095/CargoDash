@@ -1,6 +1,9 @@
 from enum import Enum
 from abc import ABC
-from numpy import array, append
+import numpy as np
+import zlib as zl
+import time
+from multiprocessing import shared_memory
 from node_input_factory.node_input_enums import NodeType
 from node_input_factory.node_input_classes import (DistanceNodeInput,
                                                    SteeringNodeInput,
@@ -23,17 +26,16 @@ class Node(ABC):
         self.name = name
         # Variables that the node uses.
         # Variable includes name and value.
-        self.variables = array([])
+        self.variables = []
 
-    def update_variable_list(self, name, value):
+    def update_variable_list(self, name, var_dict):
         updated = False
         for variable in self.variables:
-            if(variable['name'] == name):
+            if(variable['node_var_name'] == name):
                 updated = True
-                variable['value'] = value
+                variable = var_dict
         if(not updated):
-            self.variables = append(
-                self.variables, {'name': name, 'value': value})
+            self.variables.append(var_dict)
 
 
 class Steering(Node):
@@ -86,9 +88,14 @@ class ConfigureableVehicle(Vehicle):
                 The configurations are defined in 'config.yaml'.
         '''
         self.config = config
-        self.distance_nodes = array([])
-        self.temperature_nodes = array([])
-        self.engine_nodes = array([])
+        self.distance_nodes = np.array([])
+        self.temperature_nodes = np.array([])
+        self.engine_nodes = np.array([])
+        self.dict_list = []
+        self.shm = None
+        # ID used for HTTPSERVER this is not similar as
+        # the node ids for the canbus network.
+        self.http_index = 0
         nodes = config[config_type]['nodes']
         # Firstly, initializes vehicle according nodes that
         # are listed in the configuration file.
@@ -110,20 +117,40 @@ class ConfigureableVehicle(Vehicle):
         if(input_type == DistanceNodeInput):
             node = self._get_node(self.distance_nodes, node_input)
             if(node is not None):
-                node.set_distance(node_input.value)
+                node.update_variable_list(node_input.node_var_name,
+                                          node_input.__dict__)
         elif(input_type == SteeringNodeInput):
             if(self.steering is not None):
-                self.steering.change_angle(node_input.value)
+                self.steering.update_variable_list(node_input.node_var_name,
+                                                   node_input.__dict__)
         elif(input_type == LocalizationNodeInput):
             # TODO: add LocalizationNode for now less relevant
             pass
         elif(input_type == EngineNodeInput):
             node = self._get_node(self.engine_nodes, node_input)
             if(node is not None):
-                node.turn_on_off(node_input.value)
+                node.update_variable_list(node_input.node_var_name,
+                                          node_input.__dict__)
         elif(input_type == TemperatureNodeInput):
             # TODO: add TemperatureNode for now less relevant
             pass
+
+        self.compressed_nodes = self._compress_nodes(self.distance_nodes,
+                                                     self.temperature_nodes,
+                                                     self.engine_nodes)
+        print(self.distance_nodes[0].__dict__)
+        if(self.shm is not None):
+            self.shm.shm.close()
+            self.shm.shm.unlink()
+        self.shm = shared_memory.ShareableList([self.compressed_nodes],
+                                               name='shm_cargodash')
+
+    def _compress_nodes(self, *node_lists):
+        dict_list = []
+        for node_list in node_lists:
+            for node in node_list:
+                dict_list.append(node.__dict__)
+        return zl.compress(str(dict_list).encode('utf-8'), 2)
 
     def _add_node_to_vehicle(self, node_properties):
         # Automatically add nodes that are defined in the
@@ -131,23 +158,19 @@ class ConfigureableVehicle(Vehicle):
         node_type = NodeType(node_properties['type'])
         node_name = node_properties['name']
 
-        # ID used for HTTPSERVER this is not similar as
-        # the node ids for the canbus network.
-        http_index = 0
-
         if(node_type == NodeType.DistanceNode):
             if(not self._is_node_existing(self.distance_nodes,
                                           node_name)):
                 new_node = DistanceSensor(node_name)
-                new_node.id = http_index
-                self.distance_nodes = append(
+                new_node.id = self.http_index
+                self.distance_nodes = np.append(
                     self.distance_nodes, new_node)
         elif(node_type == NodeType.SteeringNode):
             # We don't keep a list for steering because we don't
             # expect multiple steering nodes in general.
             if(self.steering is None):
                 self.steering = Steering(node_name)
-                self.steering.id = http_index
+                self.steering.id = self.http_index
         elif(node_type == NodeType.LocalizationNode):
             # TODO: add LocalizationNode for now less relevant
             pass
@@ -155,13 +178,13 @@ class ConfigureableVehicle(Vehicle):
             if(not self._is_node_existing(self.engine_nodes,
                                           node_name)):
                 new_node = Engine(node_name)
-                new_node.id = http_index
-                self.engine_nodes = append(
+                new_node.id = self.http_index
+                self.engine_nodes = np.append(
                     self.engine_nodes, new_node)
         elif(node_type == NodeType.TemperatureNode):
             # TODO: add TemperatureNode for now less relevant
             pass
-        http_index = http_index + 1
+        self.http_index = self.http_index + 1
 
     def _get_node(self, node_list, node_input):
         for node in node_list:

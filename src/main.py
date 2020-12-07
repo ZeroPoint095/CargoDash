@@ -18,6 +18,7 @@ if __name__ == "__main__":
     can_open_interpreter = CanOpenInterpreter(coach)
     master_node = CanOpenListener(config, config_type, can_open_interpreter)
     logger = CanBufferLogger(config, config_type)
+
     # Runs master-node and logger concurrently.
     asyncio.run(concurrently(master_node.async_network_loop(),
                              logger.listen_to_network()))

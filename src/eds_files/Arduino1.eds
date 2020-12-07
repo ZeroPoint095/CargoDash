@@ -1209,9 +1209,30 @@ SupportedObjects=2
 2=0x2001
 
 [2000]
-ParameterName=Distance
+ParameterName=Distances
+ObjectType=0x8
+SubNumber=9
+
+[2000sub0]
+ParameterName=Number of Entries
+ObjectType=0x7
+DataType=0x0005
+AccessType=rw
+DefaultValue=2
+PDOMapping=1
+
+[2000sub1]
+ParameterName=Distance 1
 ObjectType=0x7
 DataType=0x0003
 AccessType=rw
-DefaultValue=1023
+DefaultValue=2
+PDOMapping=1
+
+[2000sub2]
+ParameterName=Distance 2
+ObjectType=0x7
+DataType=0x0003
+AccessType=rw
+DefaultValue=3
 PDOMapping=1

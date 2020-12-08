@@ -139,6 +139,12 @@ class CanOpenListener(Listener):
             node_id : integer
                 Used to read node purpose.
 
+            index : string
+                Index of the variable.
+
+            sub_index : string
+                Sub-index of the variable.
+
             Returns void.
         '''
         # Iterates through self.nodes to find correct node with id.

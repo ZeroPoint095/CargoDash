@@ -25,6 +25,12 @@ class CanOpenInterpreter(Interpreter):
                 A dictionary that contains a name/description about the node
                 and the type of the node.
 
+            index : string
+                Index of the variable.
+
+            sub_index : string
+                Sub-index of the variable.
+
             Returns void.
         '''
         self._interpret_object(sdo_value, sdo_name,
@@ -38,18 +44,23 @@ class CanOpenInterpreter(Interpreter):
         # Checks every possible node
         if(NodeType.DistanceNode == node_type):
             n_input = self.node_input_factory.create_distance_node_input(
-                unpack('h', value)[0], name, node_name, index, sub_index)
+                unpack('h', value)[0], name, node_name, index=index,
+                sub_index=sub_index)
         elif(NodeType.SteeringNode == node_type):
             n_input = self.node_input_factory.create_steering_node_input(
-                unpack('h', value)[0], name, node_name, index, sub_index)
+                unpack('h', value)[0], name, node_name, index=index,
+                sub_index=sub_index)
         elif(NodeType.LocalizationNode == node_type):
             n_input = self.node_input_factory.create_localization_node_input(
-                value, name, node_name, index, sub_index)
+                value, name, node_name, index=index, 
+                sub_index=sub_index)
         elif(NodeType.EngineNode == node_type):
             value_to_bool = True if unpack('h', value)[0] == 1 else False
             n_input = self.node_input_factory.create_engine_node_input(
-                value_to_bool, name, node_name, index, sub_index)
+                value_to_bool, name, node_name, index=index,
+                sub_index=sub_index)
         else:
             n_input = self.node_input_factory.create_temperature_node_input(
-                unpack('h', value)[0], name, node_name, index, sub_index)
+                unpack('h', value)[0], name, node_name, index=index,
+                sub_index=sub_index)
         self.vehicle.edit_vehicle_state(n_input)

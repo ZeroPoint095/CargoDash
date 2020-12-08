@@ -2,7 +2,6 @@ from enum import Enum
 from abc import ABC
 import numpy as np
 import zlib as zl
-import time
 from multiprocessing import shared_memory
 from node_input_factory.node_input_enums import NodeType
 from node_input_factory.node_input_classes import (DistanceNodeInput,
@@ -108,7 +107,7 @@ class ConfigureableVehicle(Vehicle):
         self.temperature_nodes = np.array([])
         self.engine_nodes = np.array([])
         self.dict_list = []
-        self.shm = None
+        self.shared_list = None
         # ID used for HTTPSERVER this is not similar as
         # the node ids for the canbus network.
         self.http_index = 0
@@ -155,23 +154,23 @@ class ConfigureableVehicle(Vehicle):
                                                      self.temperature_nodes,
                                                      self.engine_nodes)
         # Closes previous shared memory block.
-        if(self.shm is not None):
-            self.shm.shm.close()
-            self.shm.shm.unlink()
+        if(self.shared_list is not None):
+            self.shared_list.shm.close()
+            self.shared_list.shm.unlink()
         try:
             # Tries to add new memory block with information
             # containing the nodes.
-            self.shm = shared_memory.ShareableList([self.compressed_nodes],
-                                                   name='shm_cargodash')
+            self.shared_list = shared_memory.ShareableList(
+                [self.compressed_nodes], name='shm_cargodash')
         except FileExistsError:
-            # Old shared memory block is still open and needs to 
+            # Old shared memory block is still open and needs to
             # be closed.
             temp_shm = shared_memory.ShareableList(name='shm_cargodash')
             temp_shm.shm.close()
             temp_shm.shm.unlink()
             # Now able to add wanted shared memory block.
-            self.shm = shared_memory.ShareableList([self.compressed_nodes],
-                                                   name='shm_cargodash')
+            self.shared_list = shared_memory.ShareableList(
+                [self.compressed_nodes], name='shm_cargodash')
 
     def _compress_nodes(self, *node_lists):
         dict_list = []

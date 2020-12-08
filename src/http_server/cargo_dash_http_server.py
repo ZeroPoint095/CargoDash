@@ -7,6 +7,17 @@ from multiprocessing import shared_memory
 routes = web.RouteTableDef()
 
 
+def set_headers(response):
+    ''' Updates the HTTP headers
+        so that we are able to bypass CORS errors.
+
+        Returns the updated Response.
+    '''
+    response.headers['Access-Control-Allow-Origin'] = '*'
+    response.headers['Access-Control-Allow-Credentials'] = 'true'
+    return response
+
+
 def uncompress_logging_information():
     ''' Uncompresses the shared logging information.
 
@@ -57,7 +68,7 @@ async def get_all_nodes(request):
             ...
         ]
     '''
-    return web.json_response(uncompress_nodes_information())
+    return set_headers(web.json_response(uncompress_nodes_information()))
 
 
 @routes.get('/node/{id}')
@@ -80,11 +91,13 @@ async def get_node(request):
     try:
         node_id = int(request.match_info['id'])
     except ValueError:
-        return web.json_response({'message': 'Node doesn\'t exist!'})
+        return set_headers(web.json_response(
+            {'message': 'Node doesn\'t exist!'}))
     if(node_id >= 0 and node_id < len(all_nodes)):
-        return web.json_response(all_nodes[node_id])
+        return set_headers(web.json_response(all_nodes[node_id]))
     else:
-        return web.json_response({'message': 'Node doesn\'t exist!'})
+        return set_headers(web.json_response(
+            {'message': 'Node doesn\'t exist!'}))
 
 
 @routes.get('/node/{id}/{var_name}')
@@ -110,17 +123,20 @@ async def get_variable(request):
         node_id = int(request.match_info['id'])
         var_name = request.match_info['var_name']
     except ValueError:
-        return web.json_response({'message': 'Variable doesn\'t exist!'})
+        return set_headers(web.json_response(
+            {'message': 'Variable doesn\'t exist!'}))
     if(node_id >= 0 and node_id < len(all_nodes)):
         found = False
         for variable in all_nodes[node_id]['variables']:
             if(variable['node_var_name'] == var_name):
                 found = True
-                return web.json_response(variable)
+                return set_headers(web.json_response(variable))
         if(not found):
-            return web.json_response({'message': 'Variable doesn\'t exist!'})
+            return set_headers(web.json_response(
+                {'message': 'Variable doesn\'t exist!'}))
     else:
-        return web.json_response({'message': 'Variable doesn\'t exist!'})
+        return set_headers(web.json_response(
+            {'message': 'Variable doesn\'t exist!'}))
 
 
 @routes.post('/node/{id}/{var_name}')
@@ -164,7 +180,7 @@ async def get_logging_buffer(request):
         ]"
     '''
 
-    return web.json_response(uncompress_logging_information())
+    return set_headers(web.json_response(uncompress_logging_information()))
 
 
 app = web.Application()

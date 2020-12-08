@@ -16,7 +16,7 @@ class CanBufferLogger(BufferLogger):
         self.can_logging = self.config[
             self.config_type]['raw_can_data_logging']
         if(self.can_logging['enabled']):
-            self.shm = None
+            self.shared_list = None
             self.can_logging_buffer = self.can_logging['buffer']
             self.buffered_data = empty([self.can_logging_buffer],
                                        dtype=can.Message)
@@ -56,17 +56,17 @@ class CanBufferLogger(BufferLogger):
 
                 index = (index + 1) % self.can_logging_buffer
                 # At every n-th index update shared memory for HTTP server
-                if (index % self.can_logging['update_shm'] == 0):
+                if (index % self.can_logging['update_shm_threshold'] == 0):
                     # First close open shared memory
-                    if(self.shm is not None):
-                        self.shm.shm.close()
-                        self.shm.shm.unlink()
+                    if(self.shared_list is not None):
+                        self.shared_list.shm.close()
+                        self.shared_list.shm.unlink()
                     # Compresses buffered data
                     temp_buff_data = zl.compress(
                         array2string(self.buffered_data).encode('UTF-8'), 2)
                     try:
                         # Try to share buffered data
-                        self.shm = shared_memory.ShareableList(
+                        self.shared_list = shared_memory.ShareableList(
                             [temp_buff_data], name='shm_buff_data')
                     except FileExistsError:
                         # Logs where still saved so needs to close first
@@ -74,7 +74,7 @@ class CanBufferLogger(BufferLogger):
                             name='shm_buff_data')
                         temp_shm.shm.close()
                         temp_shm.shm.unlink()
-                        self.shm = shared_memory.ShareableList(
+                        self.shared_list = shared_memory.ShareableList(
                             [temp_buff_data], name='shm_buff_data')
 
         except KeyboardInterrupt:

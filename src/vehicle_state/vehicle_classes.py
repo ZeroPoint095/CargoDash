@@ -176,7 +176,8 @@ class ConfigureableVehicle(Vehicle):
         # Fetches from all information from the node_lists
         for node_list in node_lists:
             for node in node_list:
-                node.variables = node.variables.tolist()
+                if(type(node.variables) != list):
+                    node.variables = node.variables.tolist()
                 dict_list = np.append(dict_list, node.__dict__)
         # Compresses the data
         return zl.compress(str(dict_list.tolist()).encode('UTF-8'), 2)

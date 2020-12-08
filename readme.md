@@ -127,7 +127,7 @@ And don't forget to import *LidarNodeInput* at the *node_input_factory.py* file.
 In class *CanOpenInterpreter* you need to add the node check between the last elif and else.
 You should make it similar like this.
 ```python
-    # Change at: interpreter/can_open_interpreter.py
+    # Change in: interpreter/can_open_interpreter.py
 
     ...
     elif(NodeType.LidarNode == node_type):

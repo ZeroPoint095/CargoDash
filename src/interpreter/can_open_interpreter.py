@@ -53,7 +53,7 @@ class CanOpenInterpreter(Interpreter):
                 sub_index=sub_index)
         elif(NodeType.LocalizationNode == node_type):
             n_input = self.node_input_factory.create_localization_node_input(
-                value, name, node_name, index=index, 
+                value, name, node_name, index=index,
                 sub_index=sub_index)
         elif(NodeType.EngineNode == node_type):
             value_to_bool = True if unpack('h', value)[0] == 1 else False

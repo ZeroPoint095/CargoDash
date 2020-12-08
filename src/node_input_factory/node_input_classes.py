@@ -64,7 +64,7 @@ class LocalizationNodeInput(NodeInput):
     # Enum 2
     def __init__(self, location: str, node_var_name: str, node_name: str,
                  **additional_attributes):
-        super().__init__(location, node_var_name, node_name, 
+        super().__init__(location, node_var_name, node_name,
                          **additional_attributes)
 
 
@@ -72,7 +72,7 @@ class EngineNodeInput(NodeInput):
     # Enum 3
     def __init__(self, set_engine: bool, node_var_name: str, node_name: str,
                  **additional_attributes):
-        super().__init__(set_engine, node_var_name, node_name, 
+        super().__init__(set_engine, node_var_name, node_name,
                          **additional_attributes)
 
 
@@ -80,5 +80,5 @@ class TemperatureNodeInput(NodeInput):
     # Enum 4
     def __init__(self, temperature: float, node_var_name: str, node_name: str,
                  **additional_attributes):
-        super().__init__(temperature, node_var_name, node_name, 
+        super().__init__(temperature, node_var_name, node_name,
                          **additional_attributes)

@@ -21,8 +21,9 @@ class NodeInputFactory:
         return SteeringNodeInput(steering_angle, node_var_name, node_name,
                                  **additional_attributes)
 
-    def create_localization_node_input(self, location, node_var_name: str,
-                                       node_name: str, **additional_attributes):
+    def create_localization_node_input(
+        self, location, node_var_name: str, node_name: str,
+            **additional_attributes):
         # not sure how data will look like for location
         return LocalizationNodeInput(location, node_var_name, node_name,
                                      **additional_attributes)

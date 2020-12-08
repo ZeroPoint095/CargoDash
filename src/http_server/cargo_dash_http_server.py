@@ -1,4 +1,3 @@
-import asyncio
 import json
 import zlib as zl
 from aiohttp import web

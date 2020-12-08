@@ -43,6 +43,7 @@ class CanOpenInterpreter(Interpreter):
         node_type = NodeType(node_type_index)
         # Checks every possible node
         if(NodeType.DistanceNode == node_type):
+            # Adding index, sub_index as additional attributes.
             n_input = self.node_input_factory.create_distance_node_input(
                 unpack('h', value)[0], name, node_name, index=index,
                 sub_index=sub_index)

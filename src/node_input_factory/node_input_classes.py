@@ -15,6 +15,9 @@ class NodeInput(ABC):
             node_name : string
                 Description what the node is functioning for.
 
+            additional_attributes
+                Able to add multiple extra attibutes
+
         '''
         self.node_var_name = node_var_name
         self.value = value

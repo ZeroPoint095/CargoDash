@@ -46,24 +46,39 @@ class CanBufferLogger(BufferLogger):
         # Uses circular buffer implementation which overwrites
         # oldest index with new data once the buffer is full.
         index = 0
+        buffer_full = False
         try:
             while True:
                 can_msg = await self.reader.get_message()
                 # Sleeps 0.1 seconds so doesn't try to read all messages
                 # at once.
                 await asyncio.sleep(0.1)
-                self.buffered_data[index] = can_msg
+                self.buffered_data[index] = {
+                    'timestamp': can_msg.timestamp,
+                    'arbitration_id': can_msg.arbitration_id,
+                    'data': (can_msg.data).hex(' '),
+                    'channel': can_msg.channel}
 
                 index = (index + 1) % self.can_logging_buffer
+                if(index == 0):
+                    buffer_full = True
                 # At every n-th index update shared memory for HTTP server
                 if (index % self.can_logging['update_shm_threshold'] == 0):
                     # First close open shared memory
                     if(self.shared_list is not None):
                         self.shared_list.shm.close()
                         self.shared_list.shm.unlink()
-                    # Compresses buffered data
-                    temp_buff_data = zl.compress(
-                        array2string(self.buffered_data).encode('UTF-8'), 2)
+                    # Skips None data
+                    if(not buffer_full):
+                        # Compresses buffered data
+                        temp_buff_data = zl.compress(
+                            str(self.buffered_data[:index].tolist(
+                            )).encode('UTF-8'), 2)
+                    else:
+                        # Compresses buffered data
+                        temp_buff_data = zl.compress(
+                            str(self.buffered_data.tolist(
+                            )).encode('UTF-8'), 2)
                     try:
                         # Try to share buffered data
                         self.shared_list = shared_memory.ShareableList(

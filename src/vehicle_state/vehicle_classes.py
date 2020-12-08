@@ -29,7 +29,7 @@ class Node(ABC):
         self.name = name
         # Variables that the node uses.
         # Variable includes name and value.
-        self.variables = []
+        self.variables = np.array([])
 
     def update_variable_list(self, name, var_dict):
         ''' Updates the variable list of the node.
@@ -50,7 +50,7 @@ class Node(ABC):
                 updated = True
                 variable['value'] = var_dict['value']
         if(not updated):
-            self.variables.append(var_dict)
+            self.variables = np.append(self.variables, var_dict)
 
 
 class Steering(Node):
@@ -173,13 +173,14 @@ class ConfigureableVehicle(Vehicle):
                 [self.compressed_nodes], name='shm_cargodash')
 
     def _compress_nodes(self, *node_lists):
-        dict_list = []
+        dict_list = np.array([])
         # Fetches from all information from the node_lists
         for node_list in node_lists:
             for node in node_list:
-                dict_list.append(node.__dict__)
+                node.variables = node.variables.tolist()
+                dict_list = np.append(dict_list, node.__dict__)
         # Compresses the data
-        return zl.compress(str(dict_list).encode('UTF-8'), 2)
+        return zl.compress(str(dict_list.tolist()).encode('UTF-8'), 2)
 
     def _add_node_to_vehicle(self, node_properties):
         # Automatically add nodes that are defined in the

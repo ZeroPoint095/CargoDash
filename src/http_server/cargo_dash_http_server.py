@@ -28,7 +28,9 @@ def uncompress_logging_information():
     except FileNotFoundError:
         return {'message': 'Cannot fetch buffered logger'}
     all_logs = zl.decompress(shared_logs[0]).decode('UTF-8')
-    return all_logs
+    all_logs = '"'.join(all_logs.split("'"))
+    logs_as_json = json.loads(all_logs)
+    return logs_as_json
 
 
 def uncompress_nodes_information():

@@ -106,7 +106,6 @@ class ConfigureableVehicle(Vehicle):
         self.distance_nodes = np.array([])
         self.temperature_nodes = np.array([])
         self.engine_nodes = np.array([])
-        self.dict_list = []
         self.shared_list = None
         # ID used for HTTPSERVER this is not similar as
         # the node ids for the canbus network.

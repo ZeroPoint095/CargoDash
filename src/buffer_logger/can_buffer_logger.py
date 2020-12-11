@@ -102,8 +102,10 @@ class CanBufferLogger(BufferLogger):
 
             Returns void.
         '''
-
-        self._log_data(array2string(self.buffered_data))
+        if(self.can_logging['enabled']):
+            self._log_data(array2string(self.buffered_data))
+        else:
+            print('Logging is disabled!')
 
     def _log_data(self, message):
         log_file_name = datetime.now().strftime('%Y-%m-%d-%H:%M:%S') + '.log'

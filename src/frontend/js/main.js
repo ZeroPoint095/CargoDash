@@ -1,8 +1,9 @@
 import { getAllNodes, getNode, getVariable, getLoggingBuffer } from './CargoDashService.js';
 
-const createDivWithHeader = (parent, text, headerType = 'h3') => {
+const createDivWithHeader = (parent, text, id, headerType = 'h3') => {
     const div = document.createElement('div');
     div.className = 'node-card';
+    div.setAttribute('id', id);
     const header = document.createElement(headerType);
     header.className = 'node-title';
     const title = document.createTextNode(text);
@@ -50,7 +51,7 @@ const addParagraphWithText = (parent, inputText) => {
 const addNavbarLink = (parent, inputText) => {
     const link = document.createElement('a');
     link.className = 'nav-link';
-    link.setAttribute('href', '#'+inputText)
+    link.setAttribute('href', '#'+inputText);
     const text = document.createTextNode(inputText);
     link.appendChild(text);
     parent.appendChild(link);
@@ -60,7 +61,7 @@ getAllNodes().then(response => {
     const section = document.getElementById('section');
     const nav = document.getElementById('nav');
     for(let node of response) {
-        let div = createDivWithHeader(section, node.name + ' | ' + node.type);
+        let div = createDivWithHeader(section, node.name + ' | ' + node.type, node.name);
         addNavbarLink(nav, node.name);
         for (const [key, value] of Object.entries(node)) {
             createBootstrapContainerWithRow(div, key, value);

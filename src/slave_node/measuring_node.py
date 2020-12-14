@@ -31,7 +31,7 @@ class MeasuringSlaveNode:
             bitrate = self.config[INTERFACE]['bitrate']
             network.connect(bustype=bustype, channel=channel, bitrate=bitrate)
         except OSError:
-            logging.error('CanOpenListener is unable to listen to network,'
+            logging.error('MeasuringSlaveNode is unable to listen to network,'
                           ' please check if configuration is set properly!'
                           f'(bustype = {bustype}, channel = {channel},'
                           f' bitrate = {bitrate})')

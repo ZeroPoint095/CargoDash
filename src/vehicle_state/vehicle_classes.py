@@ -27,6 +27,7 @@ class Node(ABC):
         # Name of the node itself.
         self.id = None
         self.name = name
+        self.type = None
         # Variables that the node uses.
         # Variable includes name and value.
         self.variables = np.array([])
@@ -193,6 +194,7 @@ class ConfigureableVehicle(Vehicle):
                                           node_name)):
                 new_node = DistanceSensor(node_name)
                 new_node.id = self.http_index
+                new_node.type = node_type.name
                 self.distance_nodes = np.append(
                     self.distance_nodes, new_node)
         elif(node_type == NodeType.SteeringNode):
@@ -201,6 +203,7 @@ class ConfigureableVehicle(Vehicle):
             if(self.steering is None):
                 self.steering = Steering(node_name)
                 self.steering.id = self.http_index
+                self.steering.type = node_type.name
         elif(node_type == NodeType.LocalizationNode):
             # TODO: add LocalizationNode for now less relevant
             pass
@@ -209,6 +212,7 @@ class ConfigureableVehicle(Vehicle):
                                           node_name)):
                 new_node = Engine(node_name)
                 new_node.id = self.http_index
+                new_node.type = node_type.name
                 self.engine_nodes = np.append(
                     self.engine_nodes, new_node)
         elif(node_type == NodeType.TemperatureNode):

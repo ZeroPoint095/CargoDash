@@ -1,6 +1,8 @@
 import canopen
 import logging
 import asyncio
+import time
+import can
 
 from listener.listener import Listener
 from numpy import array, append
@@ -53,7 +55,7 @@ class CanOpenListener(Listener):
                           f' bitrate = {bitrate})')
         return network
 
-    def listen_to_network(self):
+    def listen_to_network(self, nodes):
         ''' Listens to connected network and tries to find any value changes
             within any connected node.
             The network sends out SDOs to be able to notice the value changes.
@@ -62,7 +64,7 @@ class CanOpenListener(Listener):
         '''
 
         # Listens to every node
-        for node_id in self.network:
+        for node_id in nodes:
             # Within a node find the variables saved
             for sdo_object in self.network[node_id].sdo.values():
                 # And then get each variable's index and read it
@@ -87,10 +89,17 @@ class CanOpenListener(Listener):
             Loops forever.
         '''
         try:
-            while True:
-                self.listen_to_network()
-                # Sleeps 0.1 seconds
-                await asyncio.sleep(0.1)
+            self.network.scanner.search()
+            time.sleep(0.05)
+            if(len(self.network.scanner.nodes) > 0):
+                while True:
+                    self.listen_to_network(self.network.scanner.nodes)
+                    # Sleeps 0.1 seconds
+                    await asyncio.sleep(0.1)
+            else:
+                logging.error('No nodes to listen to!')
+        except can.CanError:
+            logging.error("CAN network is down!")
         except KeyboardInterrupt:
             pass
 
@@ -102,7 +111,8 @@ class CanOpenListener(Listener):
                 sdo_value = sdo_client.upload(sdo_index, subindex)
                 # Checks for every subindex if value changed
                 if(self._sdo_value_changed(index_and_subindex, sdo_value)):
-                    self.inform_interpreter(sdo_value,
+                    self.inform_interpreter(
+                         sdo_value,
                          sdo_client[sdo_index][subindex].od.name, node_id,
                          hex(sdo_index), hex(subindex))
 

@@ -49,8 +49,11 @@ class CanOpenTestNetwork(TestNetwork):
         try:
             self.network.scanner.search()
             time.sleep(2)
-        except can.CanError:
-            logging.error("CAN network is down!")
+        except can.CanError as exc:
+            if('[Errno 100] Network is down' in repr(exc)):
+                logging.error("CAN network is down!")
+            else:
+                raise exc
 
         for node_id in self.network:
             if(node_id not in self.network.scanner.nodes):

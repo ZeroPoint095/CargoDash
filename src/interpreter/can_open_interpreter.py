@@ -75,29 +75,13 @@ class CanOpenInterpreter(Interpreter):
 
     def _get_unpack_format(self, can_open_data_type):
         result = ''
-        if(can_open_data_type == '0x1'):
-            result = 'c'
-        elif(can_open_data_type == '0x2'):
-            result = 'b'
-        elif(can_open_data_type == '0x3'):
-            result = 'h'
-        elif(can_open_data_type == '0x4'):
-            result = 'i'
-        elif(can_open_data_type == '0x15'):
-            result = 'q'
-        elif(can_open_data_type == '0x5'):
-            result = 'B'
-        elif(can_open_data_type == '0x6'):
-            result = 'H'
-        elif(can_open_data_type == '0x7'):
-            result = 'I'
-        elif(can_open_data_type == '0x1B'):
-            result = 'Q'
-        elif(can_open_data_type == '0x8'):
-            result = 'f'
-        elif(can_open_data_type == '0x11'):
-            result = 'd'
 
-        if(result == ''):
+        data_types = {'0x1': 'c', '0x2': 'b', '0x3': 'h', '0x4': 'i',
+                      '0x15': 'q', '0x5': 'B', '0x6': 'H', '0x7': 'I',
+                      '0x1B': 'Q', '0x8': 'f', '0x11': 'd'}
+        try:
+            result = data_types[can_open_data_type]
+        except KeyError:
             print(f'Data type {can_open_data_type} is not supported!')
+
         return result

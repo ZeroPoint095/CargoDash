@@ -98,8 +98,11 @@ class CanOpenListener(Listener):
                     await asyncio.sleep(0.1)
             else:
                 logging.error('No nodes to listen to!')
-        except can.CanError:
-            logging.error("CAN network is down!")
+        except can.CanError as exc:
+            if ('[Errno 100] Network is down' in repr(exc)):
+                logging.error('CAN network is down!')
+            else:
+                raise exc
         except KeyboardInterrupt:
             pass
 

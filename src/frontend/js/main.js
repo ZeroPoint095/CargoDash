@@ -8,6 +8,23 @@ const createElement = (type, ...attributes) => {
     return element;
 }
 
+const createIdSafeString = (...strings) => {
+    const ErrorThrown = false;
+    const newStringList = [];
+    for(let string of strings) {
+        if(typeof string !== 'string') {
+            ErrorThrown = true;
+            throw new Error(string, 'is not a String!');
+        } else {
+            newStringList.push(string.replaceAll(' ', '_'));
+        }
+    }
+    if(ErrorThrown) {
+        return 'incorrect-id';
+    } else {
+        return newStringList.join('-');
+    }
+}
 
 const createDivWithHeader = (parent, text, id, headerType = 'h3') => {
     const div = createElement('div', ['class', 'node-card'], ['id', id]);
@@ -59,14 +76,19 @@ const createHeaderCell = (content, scope) => {
     return th;
 }
 
-const createContentCell = (content) => {
-    const td = document.createElement('td');
+const createContentCell = (content, id = '') => {
+    let td;
+    if (id === '') {
+        td = createElement('td');
+    } else {
+        td = createElement('td', ['id', id]);
+    }
     const text = document.createTextNode(content);
     td.appendChild(text);
     return td;
 }
 
-const createTable = (node, parent = null) => {
+const createTable = (object, objectName = '', parent = null) => {
     const table = createElement('table', ['class', 'table']);
     
     const thead = document.createElement('thead');
@@ -79,12 +101,12 @@ const createTable = (node, parent = null) => {
 
     const tbody = document.createElement('tbody');
     let index = 1;
-    for(const [key, value] of Object.entries(node)) {
+    for(const [key, value] of Object.entries(object)) {
         if (key !== 'variables') {
             const tr = document.createElement('tr');
             tr.appendChild(createHeaderCell(index.toString(), 'row'));
             tr.appendChild(createContentCell(key));
-            tr.appendChild(createContentCell(value));
+            tr.appendChild(createContentCell(value, createIdSafeString(objectName, key)));
             tbody.appendChild(tr);
             index++;
         }
@@ -96,7 +118,7 @@ const createTable = (node, parent = null) => {
     return table;
 }
 
-const createBootstrapContainerWithRow = (parent = null, ...textContent) => {
+/* const createBootstrapContainerWithRow = (parent = null, ...textContent) => {
     const container = createElement('div', ['class', 'container']);
 
     const row = createElement('row', ['class', 'row']);
@@ -127,13 +149,24 @@ const addParagraphWithText = (parent, inputText) => {
     const text = document.createTextNode(inputText);
     paragraph.appendChild(text);
     parent.appendChild(paragraph); 
-}
+} */
 
 const addNavbarLink = (parent, inputText) => {
     const link = createElement('a', ['class', 'nav-link'], ['href', '#'+inputText]);
     const text = document.createTextNode(inputText);
     link.appendChild(text);
     parent.appendChild(link);
+}
+
+const updateNodeVariableValues = () => {
+    getAllNodes().then(response => {
+        for(const node of response) {
+            for(const variable of node.variables) {
+                let varValue = document.getElementById(createIdSafeString(variable.node_var_name, 'value'));
+                varValue.innerHTML = variable.value;
+            }
+        }
+    });
 }
 
 getAllNodes().then(response => {
@@ -143,12 +176,15 @@ getAllNodes().then(response => {
         let div = createDivWithHeader(section, node.name + ' | ' + node.type, node.name);
         addNavbarLink(nav, node.name);
         // node table
-        createTable(node, div);
+        createTable(node, node.name, div);
         createVariablesHeader(div, 'h4');
         const accordion = createAccordion(div);
         for(const variable of node.variables) {
-            const table = createTable(variable);
-            createAccordionItem(accordion, Math.random().toString().replace('.',''), variable.node_var_name, table);
+            const table = createTable(variable, variable.node_var_name);
+            createAccordionItem(accordion, createIdSafeString(variable.node_var_name), variable.node_var_name, table);
         }
     }
 });
+
+setInterval(() => updateNodeVariableValues(), 500);
+

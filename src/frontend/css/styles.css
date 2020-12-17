@@ -1,6 +1,7 @@
 body {
     background-color: #eee;
 }
+
 .app-title {
     margin-left: 30px;
     margin-top: 15px;
@@ -19,4 +20,11 @@ body {
 .container {
     margin: 0px !important;
     padding: 0px !important;
+}
+
+.footer {
+    position: fixed;
+    transform: translate(-50%, 0);
+    left: 50%;
+    bottom: 0;
 }

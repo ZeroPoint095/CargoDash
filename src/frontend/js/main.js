@@ -1,4 +1,12 @@
 import { getAllNodes, getNode, getVariable, getLoggingBuffer } from './CargoDashService.js';
+/*const getAllNodes = async () => {
+    // mock function
+    const randomValue = Math.floor(Math.random() * 1024);
+    const jsonString =
+    '[{"distance": 0, "id": 0, "name": "Front view object distance", "type": "DistanceNode", "variables": [{"node_var_name": "Sensor", "value": '+ randomValue.toString() +', "node_name": "Front view object distance", "index": "0x2000", "sub_index": "0x0"}, {"node_var_name": "Actuator", "value": 0, "node_name": "Front view object distance", "index": "0x2001", "sub_index": "0x0"}]}]';
+    return await JSON.parse(jsonString);
+}*/
+// Start: Helper methods
 
 const createElement = (type, ...attributes) => {
     const element = document.createElement(type);
@@ -9,14 +17,14 @@ const createElement = (type, ...attributes) => {
 }
 
 const createIdSafeString = (...strings) => {
-    const ErrorThrown = false;
+    let ErrorThrown = false;
     const newStringList = [];
     for(let string of strings) {
         if(typeof string !== 'string') {
             ErrorThrown = true;
             throw new Error(string, 'is not a String!');
         } else {
-            newStringList.push(string.replaceAll(' ', '_'));
+            newStringList.push(string.replace(/ /g, '_'));
         }
     }
     if(ErrorThrown) {
@@ -26,12 +34,21 @@ const createIdSafeString = (...strings) => {
     }
 }
 
+// End: Helper methods
+
+const createElementWithText = (parent, text, ElementType = 'h3', ...attributes) => {
+    const element = createElement(ElementType, ...attributes);
+    const title = document.createTextNode(text);
+    element.appendChild(title);
+    if(parent != null) {
+        parent.appendChild(element);
+    }
+    return element;
+}
+
 const createDivWithHeader = (parent, text, id, headerType = 'h3') => {
     const div = createElement('div', ['class', 'node-card'], ['id', id]);
-    const header = createElement(headerType, ['class', 'node-title']);
-    const title = document.createTextNode(text);
-    header.appendChild(title);
-    div.appendChild(header);
+    createElementWithText(div, text, headerType);
     parent.appendChild(div);
     return div;
 }
@@ -47,7 +64,7 @@ const createAccordionItem = (parent, id, title, table) => {
     const header = createElement('h2', ['class', 'accordion-header']);
     const button = createElement('button', ['class', 'accordion-button'], 
         ['type', 'button'], ['data-bs-toggle', 'collapse'], ['data-bs-target', '#collapse-' + id]
-        ,['aria-expanded','true'], ['aria-controls', 'collapse-' + id]);
+        ,['aria-expanded','true'], ['aria-controls', 'collapse-' + id], ['id', 'id-' + id]);
     const text = document.createTextNode(title);
     button.appendChild(text);
     header.appendChild(button);
@@ -55,6 +72,8 @@ const createAccordionItem = (parent, id, title, table) => {
     const collapseContainer = createElement('div', ['id', 'collapse-' + id], ['class','accordion-collapse collapse']
         , ['data-bs-parent','#accordionExample']);
     const accordionBody = createElement('div', ['class', 'accordion-body']);
+    const graph = createElement('div', ['id','div_g-'+ id]);
+    accordionBody.appendChild(graph);
     accordionBody.appendChild(table);
     collapseContainer.appendChild(accordionBody);
     item.appendChild(header);
@@ -62,40 +81,14 @@ const createAccordionItem = (parent, id, title, table) => {
     parent.appendChild(item);
 }
 
-const createVariablesHeader = (parent, headerType = 'h3') => {
-    const header = createElement(headerType, ['class', 'node-title']);
-    const title = document.createTextNode('Variables');
-    header.appendChild(title);
-    parent.appendChild(header);
-}
-
-const createHeaderCell = (content, scope) => {
-    const th = createElement('th', ['scope', scope]);
-    const text = document.createTextNode(content);
-    th.appendChild(text);
-    return th;
-}
-
-const createContentCell = (content, id = '') => {
-    let td;
-    if (id === '') {
-        td = createElement('td');
-    } else {
-        td = createElement('td', ['id', id]);
-    }
-    const text = document.createTextNode(content);
-    td.appendChild(text);
-    return td;
-}
-
 const createTable = (object, objectName = '', parent = null) => {
     const table = createElement('table', ['class', 'table']);
     
     const thead = document.createElement('thead');
     const theadTr = document.createElement('tr');
-    theadTr.appendChild(createHeaderCell('#', 'col'));
-    theadTr.appendChild(createHeaderCell('Attribute', 'col'));
-    theadTr.appendChild(createHeaderCell('Value', 'col'));
+    theadTr.appendChild(createElementWithText(null, '#', 'th', ['scope', 'col']));
+    theadTr.appendChild(createElementWithText(null, 'Attribute', 'th', ['scope', 'col']));
+    theadTr.appendChild(createElementWithText(null, 'Value', 'th', ['scope', 'col']));
     thead.appendChild(theadTr);
     table.appendChild(thead);
 
@@ -104,9 +97,9 @@ const createTable = (object, objectName = '', parent = null) => {
     for(const [key, value] of Object.entries(object)) {
         if (key !== 'variables') {
             const tr = document.createElement('tr');
-            tr.appendChild(createHeaderCell(index.toString(), 'row'));
-            tr.appendChild(createContentCell(key));
-            tr.appendChild(createContentCell(value, createIdSafeString(objectName, key)));
+            tr.appendChild(createElementWithText(null, index.toString(), 'th', ['scope', 'row']));
+            tr.appendChild(createElementWithText(null, key, 'td'));
+            tr.appendChild(createElementWithText(null, value, 'td', ['id', createIdSafeString(objectName, key)]));
             tbody.appendChild(tr);
             index++;
         }
@@ -118,39 +111,6 @@ const createTable = (object, objectName = '', parent = null) => {
     return table;
 }
 
-/* const createBootstrapContainerWithRow = (parent = null, ...textContent) => {
-    const container = createElement('div', ['class', 'container']);
-
-    const row = createElement('row', ['class', 'row']);
-    for (const object of textContent) {
-        const col = createElement('div', ['class', 'col']);
-        if(typeof object === 'object' && object !== null) {
-            if(Array.isArray(object)) {
-                for (const objectpart of object) {
-                    if(objectpart.node_var_name !== undefined) {
-                        addParagraphWithText(col, objectpart.node_var_name);
-                    }
-                }
-            }
-        } else {
-            addParagraphWithText(col, object);
-        }
-        row.appendChild(col);
-    }
-    container.appendChild(row);
-    if(parent != null) {
-        parent.appendChild(container);
-    }
-    return container;
-}
-
-const addParagraphWithText = (parent, inputText) => {
-    const paragraph = document.createElement('p');
-    const text = document.createTextNode(inputText);
-    paragraph.appendChild(text);
-    parent.appendChild(paragraph); 
-} */
-
 const addNavbarLink = (parent, inputText) => {
     const link = createElement('a', ['class', 'nav-link'], ['href', '#'+inputText]);
     const text = document.createTextNode(inputText);
@@ -158,12 +118,37 @@ const addNavbarLink = (parent, inputText) => {
     parent.appendChild(link);
 }
 
+let varValues = {};
+let varGraphs = {};
+
 const updateNodeVariableValues = () => {
     getAllNodes().then(response => {
         for(const node of response) {
             for(const variable of node.variables) {
+                let collapseBody = document.getElementById('collapse-'+createIdSafeString(variable.node_var_name));
                 let varValue = document.getElementById(createIdSafeString(variable.node_var_name, 'value'));
                 varValue.innerHTML = variable.value;
+                const valueList = varValues[createIdSafeString(variable.node_var_name)];
+                if(valueList.length === 0) {
+                    valueList.push([new Date(),variable.value]);
+                } else {
+                    if(valueList[valueList.length-1][1] !== variable.value) {
+                        valueList.push([new Date(),variable.value]);
+                        if(valueList.length > 1 && varGraphs[createIdSafeString(variable.node_var_name)] == undefined && !collapseBody.classList.contains('collapse')) {
+                                console.log(valueList.length, collapseBody.classList.contains('collapsed'));
+                                varGraphs[createIdSafeString(variable.node_var_name)] = 
+                                new Dygraph(document.getElementById('div_g-' + createIdSafeString(variable.node_var_name)),
+                                varValues[createIdSafeString(variable.node_var_name)], {
+                                    drawPoints: true,
+                                    valueRange: [0.0, 1024.0],
+                                    labels: ['Time', 'Value']
+                                });
+                        }
+                        if(varGraphs[createIdSafeString(variable.node_var_name)] != undefined) {
+                            varGraphs[createIdSafeString(variable.node_var_name)].updateOptions( { 'file': valueList } );
+                        }
+                    }
+                }
             }
         }
     });
@@ -177,11 +162,12 @@ getAllNodes().then(response => {
         addNavbarLink(nav, node.name);
         // node table
         createTable(node, node.name, div);
-        createVariablesHeader(div, 'h4');
+        createElementWithText(div, 'Variables', 'h4', ['class', 'node-title']);
         const accordion = createAccordion(div);
         for(const variable of node.variables) {
             const table = createTable(variable, variable.node_var_name);
             createAccordionItem(accordion, createIdSafeString(variable.node_var_name), variable.node_var_name, table);
+            varValues[createIdSafeString(variable.node_var_name)] = [];
         }
     }
 });

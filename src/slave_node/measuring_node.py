@@ -1,6 +1,7 @@
 import canopen
 import logging
 import yaml
+import random
 from time import sleep
 
 '''
@@ -21,6 +22,8 @@ class MeasuringSlaveNode:
         self.network.create_node(5, '../eds_files/Arduino1.eds')
         while True:
             sleep(1)
+            self.network[5].sdo[0x2000][1].phys = random.randint(0, 1024)
+            self.network[5].sdo[0x2000][2].phys = random.randint(0, 1024)
             self.network.sync.transmit()
 
     def connectToNetwork(self, network):

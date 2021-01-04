@@ -125,27 +125,42 @@ const updateNodeVariableValues = () => {
     getAllNodes().then(response => {
         for(const node of response) {
             for(const variable of node.variables) {
-                let collapseBody = document.getElementById('collapse-'+createIdSafeString(variable.node_var_name));
+                
+                let collapseBody = document.getElementById('collapse-'+createIdSafeString(variable.node_name+variable.node_var_name));
+                // Location where value can been seen in html-file
                 let varValue = document.getElementById(createIdSafeString(variable.node_var_name, 'value'));
+                // Current value
                 varValue.innerHTML = variable.value;
-                const valueList = varValues[createIdSafeString(variable.node_var_name)];
-                if(valueList.length === 0) {
-                    valueList.push([new Date(),variable.value]);
+                // Searches for unique value list
+                const uniqueValueList = varValues[createIdSafeString(variable.node_name+variable.node_var_name)];
+                
+                if(uniqueValueList.length === 0) {
+                    uniqueValueList.push([new Date(), variable.value]);
                 } else {
-                    if(valueList[valueList.length-1][1] !== variable.value) {
-                        valueList.push([new Date(),variable.value]);
-                        if(valueList.length > 1 && varGraphs[createIdSafeString(variable.node_var_name)] == undefined && !collapseBody.classList.contains('collapse')) {
-                                console.log(valueList.length, collapseBody.classList.contains('collapsed'));
-                                varGraphs[createIdSafeString(variable.node_var_name)] = 
-                                new Dygraph(document.getElementById('div_g-' + createIdSafeString(variable.node_var_name)),
-                                varValues[createIdSafeString(variable.node_var_name)], {
-                                    drawPoints: true,
-                                    valueRange: [0.0, 1024.0],
-                                    labels: ['Time', 'Value']
-                                });
+                    // check if value is new
+                    if(uniqueValueList[uniqueValueList.length-1][1] !== variable.value) {
+                        // update valueList
+                        uniqueValueList.push([new Date(), variable.value]);
+                        // Check if graph initialized
+                        if(varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] == undefined
+                           && collapseBody.classList.contains('show')) {
+
+                            varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] = 
+                            new Dygraph(document.getElementById('div_g-' + createIdSafeString(variable.node_name+variable.node_var_name)),
+                            varValues[createIdSafeString(variable.node_name+variable.node_var_name)], {
+                                drawPoints: true,
+                                valueRange: [null, null],
+                                labels: ['Time', 'Value']
+                            });
                         }
-                        if(varGraphs[createIdSafeString(variable.node_var_name)] != undefined) {
-                            varGraphs[createIdSafeString(variable.node_var_name)].updateOptions( { 'file': valueList } );
+                        
+                        if(varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] != undefined) {
+                            // if not showing then stop updating
+                            if(!collapseBody.classList.contains('show')) {
+                                varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] = undefined;
+                            } else {
+                                varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)].updateOptions( { 'file': uniqueValueList } );
+                            }
                         }
                     }
                 }
@@ -166,8 +181,10 @@ getAllNodes().then(response => {
         const accordion = createAccordion(div);
         for(const variable of node.variables) {
             const table = createTable(variable, variable.node_var_name);
-            createAccordionItem(accordion, createIdSafeString(variable.node_var_name), variable.node_var_name, table);
-            varValues[createIdSafeString(variable.node_var_name)] = [];
+            createAccordionItem(accordion, createIdSafeString(variable.node_name+variable.node_var_name), variable.node_var_name, table);
+            // Creates a unique list inside the varValues object
+            // This list can be retrieved to make graphs.
+            varValues[createIdSafeString(variable.node_name+variable.node_var_name)] = [];
         }
     }
 });

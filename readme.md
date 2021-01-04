@@ -182,4 +182,21 @@ Lastly you should add in method *edit_vehicle_state*:
 
 ## API
 
-#TODO: create interface for API
+### Retrieve all nodes
+```http
+    GET /allnodes
+```
+### Retrieve specified node
+```http
+    GET /node/:id
+```
+### Retrieve specified variable
+```http
+    GET /node/:id/:var_name
+```
+### Retrieve logging
+```http
+    GET /getloggingbuffer
+```
+
+

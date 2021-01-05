@@ -61,9 +61,11 @@ class CanBufferLogger(BufferLogger):
 
                 index = (index + 1) % self.can_logging_buffer
                 if(index == 0):
+                    # Buffer is now completely full with can messages.
                     buffer_full = True
                 # At every n-th index update shared memory for HTTP server
-                if (index % self.can_logging['update_shm_threshold'] == 0):
+                if (index % self.can_logging[
+                            'shm_update_interval_threshold'] == 0):
                     # First close open shared memory
                     if(self.shared_list is not None):
                         self.shared_list.shm.close()
@@ -102,8 +104,10 @@ class CanBufferLogger(BufferLogger):
 
             Returns void.
         '''
-
-        self._log_data(array2string(self.buffered_data))
+        if(self.can_logging['enabled']):
+            self._log_data(array2string(self.buffered_data))
+        else:
+            print('Logging is disabled!')
 
     def _log_data(self, message):
         log_file_name = datetime.now().strftime('%Y-%m-%d-%H:%M:%S') + '.log'

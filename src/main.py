@@ -28,5 +28,9 @@ if __name__ == "__main__":
             logger = CanBufferLogger(config, config_type)
 
             # Runs master-node and logger concurrently.
-            asyncio.run(concurrently(master_node.async_network_loop(),
-                                     logger.listen_to_network()))
+            if(config[config_type]['raw_can_data_logging']['enabled']):
+                # Runs master-node and logger concurrently.
+                asyncio.run(concurrently(master_node.async_network_loop(),
+                            logger.listen_to_network()))
+            else:
+                asyncio.run(master_node.async_network_loop())

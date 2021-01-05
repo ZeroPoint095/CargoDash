@@ -186,17 +186,107 @@ Lastly you should add in method *edit_vehicle_state*:
 ```http
     GET /allnodes
 ```
+Returns array with all nodes in json format.
+
+Eg. returns
+```javascript
+    [{
+        type : 'DistanceNode',
+        node_name : 'Front view object distance',
+        variables : [
+            ...
+        ]
+    },
+    {
+        type : 'SteeringNode',
+        node_name : 'Steering wheel',
+        variables : [
+            ...
+        ]
+    }],
+    ...
+```
+***
 ### Retrieve specified node
 ```http
     GET /node/:id
 ```
+Returns desired node information based on node ID.
+
+#### Parameters
+id :    id of a node expects integer between 1-127 (not hex value).
+
+Eg. returns
+```javascript
+    {
+        type : 'DistanceNode',
+        node_name : 'Front view object distance',
+        variables : [
+            ...
+        ]
+    }
+```
+***
 ### Retrieve specified variable
 ```http
     GET /node/:id/:var_name
 ```
+Returns desired variable in json format.
+#### Parameters
+
+id : id of a specified node expects integer between 1-127 (not hex value).
+
+var_name: name of the desired variable.
+
+Eg. returns
+```javascript
+{
+    name: 'variable',
+    index: '0x2000',
+    sub_index: '0',
+    value : '900'
+}
+```
+
+***
+### Update specified variable
+```http
+    POST /node/:id/:var_name
+```
+Receives a post request that wants to update a value of a variable.
+Returns a message that says value is changed succesfully.
+#### Parameters:
+id : id of a specified node expects integer between 1-127 (not hex value).
+
+var_name: name of the variable that needs to be changed.
+
+Request body:
+```javascript
+{
+    value: 'new_value'
+}
+```
+
+Note: This post request has lower importance for us. Hopefully we are able to implement this.
+***
 ### Retrieve logging
 ```http
     GET /getloggingbuffer
 ```
+Returns the current logging buffer (raw messages) in json format.
 
+Eg. returns
+```javascript
+[
+    {
+        timestamp: '21314313',
+        ID: '123',
+        Data: 'FF 88 HA 99 12 77 88 99',
+        Channel: 'vcan0'
+    },
+    {
+        ...
+    }
+]
+```
 

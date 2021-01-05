@@ -103,7 +103,8 @@ class CanOpenListener(Listener):
                 sdo_data_type = hex(
                     sdo_client[sdo_index][subindex].od.data_type)
                 # Checks for every subindex if value changed
-                if(self._sdo_value_changed(index_and_subindex, sdo_value)):
+                if(self._sdo_value_changed(index_and_subindex, node_id,
+                                           sdo_value)):
                     self.inform_interpreter(
                         sdo_value, sdo_client[sdo_index][subindex].od.name,
                         sdo_data_type, node_id, hex(sdo_index), hex(subindex))
@@ -111,7 +112,7 @@ class CanOpenListener(Listener):
     def _read_simple_variable(self, sdo_client, sdo_index, node_id):
         sdo_value = sdo_client.upload(sdo_index, 0)
         sdo_data_type = hex(sdo_client[sdo_index].od.data_type)
-        if(self._sdo_value_changed(sdo_index, sdo_value)):
+        if(self._sdo_value_changed(sdo_index, node_id, sdo_value)):
             self.inform_interpreter(sdo_value, sdo_client[sdo_index].od.name,
                                     sdo_data_type, node_id, hex(sdo_index),
                                     hex(0))
@@ -172,20 +173,22 @@ class CanOpenListener(Listener):
 
         self.interpreter = interpreter
 
-    def _sdo_value_changed(self, sdo_index, sdo_value):
+    def _sdo_value_changed(self, sdo_index, node_id, sdo_value):
         # Couldn't find a possibility to subscribe to a value with the CANopen
         # library, so needed to make an implementation by myself.
 
         found = False
         changed = False
         for observer in self.observers:
-            if(observer['index'] == sdo_index):
+            if(observer['index'] == sdo_index and
+               observer['node_id'] == node_id):
                 found = True
                 if(observer['value'] != sdo_value):
                     observer['value'] = sdo_value
                     changed = True
         if(not found):
             self.observers = append(
-                self.observers, {'index': sdo_index, 'value': sdo_value})
+                self.observers, {'index': sdo_index, 'node_id': node_id,
+                                 'value': sdo_value})
             changed = True
         return changed

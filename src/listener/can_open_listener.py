@@ -100,17 +100,21 @@ class CanOpenListener(Listener):
             if(subindex != 0):
                 index_and_subindex = f'{sdo_index}sub{subindex}'
                 sdo_value = sdo_client.upload(sdo_index, subindex)
+                sdo_data_type = hex(
+                    sdo_client[sdo_index][subindex].od.data_type)
                 # Checks for every subindex if value changed
                 if(self._sdo_value_changed(index_and_subindex, sdo_value)):
-                    self.inform_interpreter(sdo_value,
-                         sdo_client[sdo_index][subindex].od.name, node_id,
-                         hex(sdo_index), hex(subindex))
+                    self.inform_interpreter(
+                        sdo_value, sdo_client[sdo_index][subindex].od.name,
+                        sdo_data_type, node_id, hex(sdo_index), hex(subindex))
 
     def _read_simple_variable(self, sdo_client, sdo_index, node_id):
         sdo_value = sdo_client.upload(sdo_index, 0)
+        sdo_data_type = hex(sdo_client[sdo_index].od.data_type)
         if(self._sdo_value_changed(sdo_index, sdo_value)):
             self.inform_interpreter(sdo_value, sdo_client[sdo_index].od.name,
-                                    node_id, hex(sdo_index), hex(0))
+                                    sdo_data_type, node_id, hex(sdo_index),
+                                    hex(0))
 
     def _add_nodes(self, nodes):
         for i in range(len(nodes)):
@@ -126,8 +130,8 @@ class CanOpenListener(Listener):
                 self.network.add_node(nodes[i]['node_properties']['id'],
                                       nodes[i]['eds_location'])
 
-    def inform_interpreter(self, sdo_value, sdo_name, node_id, index,
-                           sub_index):
+    def inform_interpreter(self, sdo_value, sdo_name, sdo_data_type, node_id,
+                           index, sub_index):
         ''' Informs the interpreter with a changed SDO.
 
             sdo_value : any
@@ -135,6 +139,10 @@ class CanOpenListener(Listener):
 
             sdo_name : canopen.sdo.Variable
                 Sends out the changed SDO name.
+
+            sdo_data_type : str
+                Sends the data_type as string representing a
+                hexadecimal value.
 
             node_id : integer
                 Used to read node purpose.
@@ -150,7 +158,8 @@ class CanOpenListener(Listener):
         # Iterates through self.nodes to find correct node with id.
         node = [x for x in self.nodes if x['id'] == node_id][0]
         self.interpreter.inform_interpreter(sdo_value, sdo_name,
-                                            node, index, sub_index)
+                                            sdo_data_type, node, index,
+                                            sub_index)
 
     def set_interpreter(self, interpreter):
         ''' Set the interpreter where CanOpenListener can send messages to.

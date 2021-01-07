@@ -5,7 +5,6 @@ canopen_example:
     nodes: [{local: false, eds_location: 'eds_files/slave_node_example.eds', node_properties: {id: 5,
         name: 'Front view object distance', type: 0}}]
     max_speed_in_ms: 3
-    raw_can_data_logging: false
     raw_can_data_logging: {
         enabled: true,
         # The value is the amount in raw can messages.
@@ -24,7 +23,7 @@ canopen_vcan:
         name: 'Front view object distance', type: 0}}]
     max_speed_in_ms: 3
     raw_can_data_logging: {
-        enabled: true,
+        enabled: false,
         # The value is the amount in raw can messages.
         # Implementation saves raw can messages up until buffer's value. 
         buffer: 1024,

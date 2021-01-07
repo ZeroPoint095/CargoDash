@@ -8,6 +8,8 @@ import { getAllNodes, getNode, getVariable, getLoggingBuffer } from './CargoDash
 }*/
 // Start: Helper methods
 
+let stopUpdating = false;
+
 const createElement = (type, ...attributes) => {
     const element = document.createElement(type);
     for(const attribute of attributes) {
@@ -72,8 +74,6 @@ const createAccordionItem = (parent, id, title, table) => {
     const collapseContainer = createElement('div', ['id', 'collapse-' + id], ['class','accordion-collapse collapse']
         , ['data-bs-parent','#accordionExample']);
     const accordionBody = createElement('div', ['class', 'accordion-body']);
-    const graph = createElement('div', ['id','div_g-'+ id]);
-    accordionBody.appendChild(graph);
     accordionBody.appendChild(table);
     collapseContainer.appendChild(accordionBody);
     item.appendChild(header);
@@ -118,6 +118,20 @@ const addNavbarLink = (parent, inputText) => {
     parent.appendChild(link);
 }
 
+const updateGraph = () => {
+    const button = document.getElementById('updateGraphButton');
+    if(!stopUpdating){
+        button.classList.remove('btn-danger');
+        button.classList.add('btn-success');
+        button.innerHTML = 'Continue Updating Graphs';
+    } else {
+        button.classList.remove('btn-success');
+        button.classList.add('btn-danger');
+        button.innerHTML = 'Stop Updating Graphs';
+    }
+    stopUpdating = !stopUpdating;
+};
+
 let varValues = {};
 let varGraphs = {};
 
@@ -142,25 +156,22 @@ const updateNodeVariableValues = () => {
                         // update valueList
                         uniqueValueList.push([new Date(), variable.value]);
                         // Check if graph initialized
-                        if(varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] == undefined
-                           && collapseBody.classList.contains('show')) {
+                        if(varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] == undefined) {
 
                             varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] = 
                             new Dygraph(document.getElementById('div_g-' + createIdSafeString(variable.node_name+variable.node_var_name)),
                             varValues[createIdSafeString(variable.node_name+variable.node_var_name)], {
                                 drawPoints: true,
+                                showRangeSelector: true,
                                 valueRange: [null, null],
                                 labels: ['Time', 'Value']
                             });
                         }
                         
-                        if(varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] != undefined) {
+                        if(varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] != undefined && !stopUpdating) {
                             // if not showing then stop updating
-                            if(!collapseBody.classList.contains('show')) {
-                                varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] = undefined;
-                            } else {
-                                varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)].updateOptions( { 'file': uniqueValueList } );
-                            }
+                            varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)].updateOptions( 
+                                { 'file': uniqueValueList} );
                         }
                     }
                 }
@@ -172,7 +183,24 @@ const updateNodeVariableValues = () => {
 getAllNodes().then(response => {
     const section = document.getElementById('section');
     const nav = document.getElementById('nav');
+    const row = createElement('div', ['class', 'row justify-content-center']);
     for(let node of response) {
+        createElementWithText(section, 'Stop Updating Graphs', 'button', ['id', 'updateGraphButton'] , ['type','button'], 
+            ['class','btn btn-danger mx-3 mt-3']);
+        // Dashboard version
+        for(const variable of node.variables) {
+            let variableDiv = createElement('div', ['class', 'col-4 m-5',], ['style','background-color:white;']);
+            createElementWithText(variableDiv, node.name + ' | ' + variable.node_var_name, 'h6',['class', 'm-2']);
+            
+            const graph = createElement('div', ['id','div_g-'+ createIdSafeString(variable.node_name+variable.node_var_name)],
+                                        ['style','width:initial;']);
+            variableDiv.appendChild(graph);
+
+            row.appendChild(variableDiv);
+        }
+        section.appendChild(row);
+
+        // Detailed version
         let div = createDivWithHeader(section, node.name + ' | ' + node.type, node.name);
         addNavbarLink(nav, node.name);
         // node table
@@ -186,8 +214,9 @@ getAllNodes().then(response => {
             // This list can be retrieved to make graphs.
             varValues[createIdSafeString(variable.node_name+variable.node_var_name)] = [];
         }
+        document.getElementById('updateGraphButton').addEventListener('click', updateGraph, false);
     }
 });
 
-setInterval(() => updateNodeVariableValues(), 500);
+setInterval(() => updateNodeVariableValues(), 1000);
 

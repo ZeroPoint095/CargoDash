@@ -1,16 +1,11 @@
 import { getAllNodes, getNode, getVariable, getLoggingBuffer } from './CargoDashService.js';
-/*const getAllNodes = async () => {
-    // mock function
-    const randomValue = Math.floor(Math.random() * 1024);
-    const jsonString =
-    '[{"distance": 0, "id": 0, "name": "Front view object distance", "type": "DistanceNode", "variables": [{"node_var_name": "Sensor", "value": '+ randomValue.toString() +', "node_name": "Front view object distance", "index": "0x2000", "sub_index": "0x0"}, {"node_var_name": "Actuator", "value": 0, "node_name": "Front view object distance", "index": "0x2001", "sub_index": "0x0"}]}]';
-    return await JSON.parse(jsonString);
-}*/
+
 // Start: Helper methods
 
 let stopUpdating = false;
 
 const createElement = (type, ...attributes) => {
+    // Create HTML Element
     const element = document.createElement(type);
     for(const attribute of attributes) {
         element.setAttribute(attribute[0], attribute[1]);
@@ -19,6 +14,7 @@ const createElement = (type, ...attributes) => {
 }
 
 const createIdSafeString = (...strings) => {
+    // Function that creates safe HTML ID's
     let ErrorThrown = false;
     const newStringList = [];
     for(let string of strings) {
@@ -36,9 +32,8 @@ const createIdSafeString = (...strings) => {
     }
 }
 
-// End: Helper methods
-
 const createElementWithText = (parent, text, ElementType = 'h3', ...attributes) => {
+    // Creates HTML Element with a text inside
     const element = createElement(ElementType, ...attributes);
     const title = document.createTextNode(text);
     element.appendChild(title);
@@ -49,24 +44,31 @@ const createElementWithText = (parent, text, ElementType = 'h3', ...attributes) 
 }
 
 const createDivWithHeader = (parent, text, id, headerType = 'h3') => {
+    // Creates HTML Div with a header
     const div = createElement('div', ['class', 'node-card'], ['id', id]);
     createElementWithText(div, text, headerType);
     parent.appendChild(div);
     return div;
 }
 
+// End: Helper methods
+
 const createAccordion = (parent) => {
+    // Creates Bootstrap accordion
+    // The accordion is tab-based element.
     const accordion = createElement('div', ['class', 'accordion'], ['id', 'accordionExample']);
     parent.appendChild(accordion);
     return accordion;
 }
 
 const createAccordionItem = (parent, id, title, table) => {
+    // Creates a tab for the accordion
     const item = createElement('div', ['class', 'accordion-item']);
     const header = createElement('h2', ['class', 'accordion-header']);
     const button = createElement('button', ['class', 'accordion-button'], 
         ['type', 'button'], ['data-bs-toggle', 'collapse'], ['data-bs-target', '#collapse-' + id]
         ,['aria-expanded','true'], ['aria-controls', 'collapse-' + id], ['id', 'id-' + id]);
+    
     const text = document.createTextNode(title);
     button.appendChild(text);
     header.appendChild(button);
@@ -82,6 +84,7 @@ const createAccordionItem = (parent, id, title, table) => {
 }
 
 const createTable = (object, objectName = '', parent = null) => {
+    // Creates Table that has information of node/variable
     const table = createElement('table', ['class', 'table']);
     
     const thead = document.createElement('thead');
@@ -112,6 +115,7 @@ const createTable = (object, objectName = '', parent = null) => {
 }
 
 const addNavbarLink = (parent, inputText) => {
+    // Adds link to the navbar
     const link = createElement('a', ['class', 'nav-link'], ['href', '#'+inputText]);
     const text = document.createTextNode(inputText);
     link.appendChild(text);
@@ -119,6 +123,8 @@ const addNavbarLink = (parent, inputText) => {
 }
 
 const updateGraph = () => {
+    // Function that is able to cancel the updating of the graphs
+    // This function is requested from the 'Stop Updating Graps' button
     const button = document.getElementById('updateGraphButton');
     if(!stopUpdating){
         button.classList.remove('btn-danger');
@@ -136,11 +142,10 @@ let varValues = {};
 let varGraphs = {};
 
 const updateNodeVariableValues = () => {
+    // Function for updating the values
     getAllNodes().then(response => {
         for(const node of response) {
             for(const variable of node.variables) {
-                
-                let collapseBody = document.getElementById('collapse-'+createIdSafeString(variable.node_name+variable.node_var_name));
                 // Location where value can been seen in html-file
                 let varValue = document.getElementById(createIdSafeString(variable.node_var_name, 'value'));
                 // Current value
@@ -157,7 +162,7 @@ const updateNodeVariableValues = () => {
                         uniqueValueList.push([new Date(), variable.value]);
                         // Check if graph initialized
                         if(varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] == undefined) {
-
+                            // initializes graph
                             varGraphs[createIdSafeString(variable.node_name+variable.node_var_name)] = 
                             new Dygraph(document.getElementById('div_g-' + createIdSafeString(variable.node_name+variable.node_var_name)),
                             varValues[createIdSafeString(variable.node_name+variable.node_var_name)], {
@@ -187,7 +192,7 @@ getAllNodes().then(response => {
     for(let node of response) {
         createElementWithText(section, 'Stop Updating Graphs', 'button', ['id', 'updateGraphButton'] , ['type','button'], 
             ['class','btn btn-danger mx-3 mt-3']);
-        // Dashboard version
+        // Initialises Graphs
         for(const variable of node.variables) {
             let variableDiv = createElement('div', ['class', 'col-4 m-5',], ['style','background-color:white;']);
             createElementWithText(variableDiv, node.name + ' | ' + variable.node_var_name, 'h6',['class', 'm-2']);
@@ -200,7 +205,7 @@ getAllNodes().then(response => {
         }
         section.appendChild(row);
 
-        // Detailed version
+        // Initialises Detailed Tables
         let div = createDivWithHeader(section, node.name + ' | ' + node.type, node.name);
         addNavbarLink(nav, node.name);
         // node table
@@ -218,5 +223,5 @@ getAllNodes().then(response => {
     }
 });
 
+// Graphs updates every second
 setInterval(() => updateNodeVariableValues(), 1000);
-

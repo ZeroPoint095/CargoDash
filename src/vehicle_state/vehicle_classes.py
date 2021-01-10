@@ -107,6 +107,7 @@ class ConfigureableVehicle(Vehicle):
         self.distance_nodes = np.array([])
         self.temperature_nodes = np.array([])
         self.engine_nodes = np.array([])
+        self.steering = None
         self.shared_list = None
         # ID used for HTTPSERVER this is not similar as
         # the node ids for the canbus network.
@@ -152,7 +153,8 @@ class ConfigureableVehicle(Vehicle):
 
         self.compressed_nodes = self._compress_nodes(self.distance_nodes,
                                                      self.temperature_nodes,
-                                                     self.engine_nodes)
+                                                     self.engine_nodes,
+                                                     self.steering)
         # Closes previous shared memory block.
         if(self.shared_list is not None):
             self.shared_list.shm.close()
@@ -176,10 +178,16 @@ class ConfigureableVehicle(Vehicle):
         dict_list = np.array([])
         # Fetches from all information from the node_lists
         for node_list in node_lists:
-            for node in node_list:
-                if(type(node.variables) != list):
-                    node.variables = node.variables.tolist()
-                dict_list = np.append(dict_list, node.__dict__)
+            if(type(node_list) is np.ndarray):
+                for node in node_list:
+                    if(type(node.variables) != list):
+                        node.variables = node.variables.tolist()
+                    dict_list = np.append(dict_list, node.__dict__)
+            else:
+                if(type(node_list.variables) != list):
+                    node_list.variables = node_list.variables.tolist()
+                dict_list = np.append(dict_list, node_list.__dict__)
+
         # Compresses the data
         return zl.compress(str(dict_list.tolist()).encode('UTF-8'), 2)
 

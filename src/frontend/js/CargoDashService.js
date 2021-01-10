@@ -22,6 +22,16 @@ export const getVariable = async (nodeId, varName) => {
     return response.json();
 }
 
+export const updateVariable = async (nodeId, varName, value) => {
+    const response = await fetch(
+        httpServerUrl + '/node/' + nodeId + '/' + varName, {
+            method: 'POST',
+            body: JSON.stringify({value: value})
+        }
+    );
+    return response.json();
+}
+
 export const getLoggingBuffer = async () => {
     const response = await fetch(
         httpServerUrl + '/getloggingbuffer');

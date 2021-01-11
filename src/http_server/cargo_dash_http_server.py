@@ -9,7 +9,6 @@ from aiohttp import web
 from multiprocessing import shared_memory
 
 routes = web.RouteTableDef()
-INTERFACE = 'canopen_vcan'
 all_saved_nodes = np.array([])
 
 
@@ -37,6 +36,41 @@ def uncompress_logging_information():
     all_logs = '"'.join(all_logs.split("'"))
     logs_as_json = json.loads(all_logs)
     return logs_as_json
+
+
+def uncompress_nodes_information():
+    ''' Uncompresses the shared node information.
+
+        Return the nodes as json.
+    '''
+    try:
+        shared_dict = shared_memory.ShareableList(name='shm_cargodash')
+    except FileNotFoundError:
+        return uncompress_nodes_information()
+    all_nodes = zl.decompress(shared_dict[0]).decode('UTF-8')
+    all_nodes = '"'.join(all_nodes.split("'"))
+    nodes_as_json = json.loads(all_nodes)
+    return nodes_as_json
+
+
+# Start: Can-related functionalities
+def connect_to_network():
+    network = canopen.Network()
+    with open('../config.yaml', 'r') as ymlfile:
+        config = yaml.safe_load(ymlfile)
+    try:
+        selected_config = config['selected_config']
+        bustype = config[selected_config]['bustype']
+        channel = config[selected_config]['channel']
+        bitrate = config[selected_config]['bitrate']
+        network.connect(bustype=bustype, channel=channel, bitrate=bitrate)
+    except OSError:
+        logging.error('CanOpenListener is unable to listen to network,'
+                      ' please check if configuration is set properly!'
+                      f'(bustype = {bustype}, channel = {channel},'
+                      f' bitrate = {bitrate})')
+    network = add_nodes(network, config[selected_config]['nodes'])
+    return config, network
 
 
 def add_nodes(network, nodes):
@@ -71,21 +105,7 @@ def update_vehicle_status(node_id, var_name, new_value):
                 if(node['name'] == variable['node_name']):
                     network[node['id']].sdo[index][sub_index].phys = new_value
                     network.sync.transmit()
-
-
-def uncompress_nodes_information():
-    ''' Uncompresses the shared node information.
-
-        Return the nodes as json.
-    '''
-    try:
-        shared_dict = shared_memory.ShareableList(name='shm_cargodash')
-    except FileNotFoundError:
-        return uncompress_nodes_information()
-    all_nodes = zl.decompress(shared_dict[0]).decode('UTF-8')
-    all_nodes = '"'.join(all_nodes.split("'"))
-    nodes_as_json = json.loads(all_nodes)
-    return nodes_as_json
+# End: Can-related functionalities
 
 
 @routes.get('/allnodes')
@@ -242,20 +262,7 @@ async def get_logging_buffer(request):
 
     return set_headers(web.json_response(uncompress_logging_information()))
 
-network = canopen.Network()
-with open('../config.yaml', 'r') as ymlfile:
-    config = yaml.safe_load(ymlfile)
-try:
-    bustype = config[INTERFACE]['bustype']
-    channel = config[INTERFACE]['channel']
-    bitrate = config[INTERFACE]['bitrate']
-    network.connect(bustype=bustype, channel=channel, bitrate=bitrate)
-except OSError:
-    logging.error('CanOpenListener is unable to listen to network,'
-                  ' please check if configuration is set properly!'
-                  f'(bustype = {bustype}, channel = {channel},'
-                  f' bitrate = {bitrate})')
-network = add_nodes(network, config[INTERFACE]['nodes'])
+config, network = connect_to_network()
 
 app = web.Application()
 app.add_routes(routes)

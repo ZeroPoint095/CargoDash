@@ -1,3 +1,5 @@
+selected_config: canopen_vcan
+
 canopen_example:
     bustype: socketcan
     channel: can0

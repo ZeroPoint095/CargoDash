@@ -11,9 +11,9 @@ async def concurrently(master_node_loop, logger_loop):
 
 
 if __name__ == "__main__":
-    config_type = 'canopen_vcan'
     with open('./config.yaml', 'r') as ymlfile:
         config = yaml.safe_load(ymlfile)
+    config_type = config['selected_config']
     coach = ConfigureableVehicle(config, config_type)
     can_open_interpreter = CanOpenInterpreter(coach)
     master_node = CanOpenListener(config, config_type, can_open_interpreter)

@@ -9,15 +9,13 @@ from time import sleep
     used for testing purposes.
 '''
 
-INTERFACE = 'canopen_vcan'
-# INTERFACE = 'canopen_slcan'
-
 
 class MeasuringSlaveNode:
     def __init__(self):
         with open('../config.yaml', 'r') as ymlfile:
             self.config = yaml.safe_load(ymlfile)
         # local node
+        self.selected_config = self.config['selected_config']
         self.connectToNetwork(canopen.Network())
         self.network.create_node(5, '../eds_files/Arduino1.eds')
         while True:
@@ -29,9 +27,9 @@ class MeasuringSlaveNode:
     def connectToNetwork(self, network):
         self.network = network
         try:
-            bustype = self.config[INTERFACE]['bustype']
-            channel = self.config[INTERFACE]['channel']
-            bitrate = self.config[INTERFACE]['bitrate']
+            bustype = self.config[self.selected_config]['bustype']
+            channel = self.config[self.selected_config]['channel']
+            bitrate = self.config[self.selected_config]['bitrate']
             network.connect(bustype=bustype, channel=channel, bitrate=bitrate)
         except OSError:
             logging.error('CanOpenListener is unable to listen to network,'

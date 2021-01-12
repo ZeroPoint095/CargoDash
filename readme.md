@@ -87,7 +87,7 @@ Inside the code block below you can read a detailed description of which configu
 For now, CargoDash is only able to work with the CanOpen protocol but it has the potential to work with more communication protocols. If you want to add a communication protocol then you should add a new interpreter and a new listener. You can easily create a new listener class that uses the same methods as the abstract listener class. The same goes for the interpreter. It's important that you create nodes from the NodeFactory inside your interpreter. The NodeFactory class creates 'Node Input' objects which can be used to change the vehicle's state. In the diagram below you can have an understanding of CargoDash internal class interaction works.
 
 
-![CargoDash Architecture](img/api_cargodash_v6.png "CargoDash Architecture")
+![CargoDash Architecture](img/api_cargodash_v7.png "CargoDash Architecture")
 
 ## Adding Nodes
 In CargoDash we already implemented certain standard nodes that would exist in a real vehicle such as SteeringNode, TemperatureNode, and more. But if you want to add your own, custom node you can add it by changing some files. You can do this using the changes described below using a LidarNode as an example.

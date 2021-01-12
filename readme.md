@@ -19,11 +19,11 @@ This document will help you to understand how to make use of CargoDash. CargoDas
 ```
     pip3 install -r requirements.txt
 ```
-3a. Run startup.sh to use CargoDash without 'mocked' slave nodes
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3a. Run startup.sh to use CargoDash without 'mocked' slave nodes
 ```
     ./startup-run_prod.sh
 ```
-3b. Run startup.sh to use CargoDash with mocked slave nodes
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3b. Run startup.sh to use CargoDash with mocked slave nodes
 ```
     ./startup-test_environment.sh
 ```  

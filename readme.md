@@ -1,9 +1,10 @@
 ﻿# CargoDash Usage Guide
 This document will help you to understand how to make use of CargoDash. CargoDash is a diagnostics tool for developing autonomous vehicles and is written in Python code (version 3.8.5). For any questions please feel free to create an issue.
 
-## Python Dependencies
+## External Python Dependencies
 ```
     aiohttp v3.7.3
+    asyncio v3.4.3
     can v3.3.4
     canopen v1.1.0
     numpy v1.19.4
@@ -18,9 +19,13 @@ This document will help you to understand how to make use of CargoDash. CargoDas
 ```
     pip3 install -r requirements.txt
 ```
-3. Run startup.sh to use CargoDash
+&nbsp;&nbsp;&nbsp;3a. Run startup.sh to use CargoDash without 'mocked' slave nodes
 ```
-    ./startup.sh
+    ./startup-run_prod.sh
+```
+&nbsp;&nbsp;&nbsp;3b. Run startup.sh to use CargoDash with mocked slave nodes
+```
+    ./startup-test_environment.sh
 ```  
 
 ## Introduction
@@ -39,6 +44,11 @@ In our application, we created a network of Arduino's that communicate with a Ra
 
 Inside the code block below you can read a detailed description of which configurations that CargoDash uses. In general, we prefer that CargoDash can be configured from one file such as the config.yaml file instead of multiple configuration places. This makes CargoDash more user-friendly and centralized. 
 ```yaml
+    # selected_config is the variable that sets which configuration is 
+    # selected for CargoDash. So for this instance, it makes use of configuration
+    # canopen_vcan.
+    selected_config: canopen_vcan
+    
     # canopen_vcan is a configuration example for the CanOpen protocol.
     # With a similar pattern you can create multiple canopen configurations.
     # For now we use canopen_vcan as example. All these paramters inside canopen_vcan 
@@ -79,7 +89,10 @@ Inside the code block below you can read a detailed description of which configu
             enabled: true,
 
             # The size of the buffer so with it can contain 1024 can messages.
-            buffer: 1024
+            buffer: 1024,
+            
+            # At every n-th message update shared memory
+            shm_update_interval_threshold: 100
         }
 ```
 ## Extending CargoDash Communication Possibilities

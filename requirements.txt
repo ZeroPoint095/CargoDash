@@ -1,4 +1,6 @@
 aiohttp
-canopen
+asyncio
 can
+canopen
 numpy
+pyyaml

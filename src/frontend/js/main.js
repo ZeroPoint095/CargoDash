@@ -3,6 +3,7 @@ import { getAllNodes, getNode, getVariable, updateVariable, getLoggingBuffer } f
 // Start: Helper methods
 
 let stopUpdating = false;
+let allNodes = [];
 
 const createElement = (type, ...attributes) => {
     // Create HTML Element
@@ -73,17 +74,16 @@ const createAccordionItem = (parent, id, title, table, type) => {
     button.appendChild(text);
     header.appendChild(button);
 
-    const collapseContainer = createElement('div', ['id', 'collapse-' + id], ['class','accordion-collapse collapse']
-        , ['data-bs-parent','#accordionExample']);
+    const collapseContainer = createElement('div', ['id', 'collapse-' + id], ['class','accordion-collapse collapse']);
     const accordionBody = createElement('div', ['class', 'accordion-body']);
     
     if(type === 'SteeringNode') {
         const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
         accordionBody.appendChild(updateInput);
-        const updateButton = createElementWithText(accordionBody, 'Update', 'button', 
-        ['id', 'update-'+ id], 
-        ['type','button'], ['class','btn btn-danger mx-1 my-3']);
-        updateButton.addEventListener('click', updateServoValue, false);
+        createElementWithText(accordionBody, 'degrees', 'label', ['class', 'mx-3']);
+    } else {
+        const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
+        accordionBody.appendChild(updateInput);
     }
 
     accordionBody.appendChild(table);
@@ -150,11 +150,25 @@ const updateGraph = () => {
 
 const updateServoValue = (e) => {
     const id = e.target.id.replace('update-', 'input-');
-    const value = parseInt(document.getElementById(id).value);
     const splittedId = id.split('-');
     const nodeId = splittedId[1];
-    const varName = splittedId[2];
-    updateVariable(nodeId, varName, value);
+    for(const node of allNodes) {
+        if(node.id == nodeId) {
+            for(const variable of node.variables) {
+                const varName = createIdSafeString(variable.node_var_name);
+                const varDocId = 'input-'+nodeId+'-'+varName;
+                try {
+                    const value = parseInt(document.getElementById(varDocId).value);
+                    if(!isNaN(value)) {
+                        console.log(value);
+                        updateVariable(nodeId, varName, value);
+                    }
+                } catch (err) {
+                    console.log('No input expected for '+ varDocId + ', so skipping update for this variable!');
+                }
+            }
+        }
+    }
 }
 
 let varValues = {};
@@ -205,6 +219,7 @@ const updateNodeVariableValues = () => {
 }
 
 getAllNodes().then(response => {
+    allNodes = response;
     const section = document.getElementById('section');
     const nav = document.getElementById('nav');
     const row = createElement('div', ['class', 'row justify-content-center']);
@@ -229,7 +244,12 @@ getAllNodes().then(response => {
         addNavbarLink(nav, node.name);
         // node table
         createTable(node, node.name, div);
-        createElementWithText(div, 'Variables', 'h4', ['class', 'node-title']);
+        createElementWithText(div, 'Variables', 'h4', ['class', 'node-title my-1']);
+        
+        const updateButton = createElementWithText(div, 'Update Variable Values', 'button', 
+        ['id', 'update-'+ node.id], 
+        ['type','button'], ['class','btn btn-primary mx-2 my-2']);
+
         const accordion = createAccordion(div);
         for(const variable of node.variables) {
 
@@ -240,6 +260,7 @@ getAllNodes().then(response => {
             varValues[createIdSafeString(variable.node_name, variable.node_var_name)] = [];
         }
         document.getElementById('updateGraphButton').addEventListener('click', updateGraph, false);
+        updateButton.addEventListener('click', updateServoValue, false);
     }
 });
 

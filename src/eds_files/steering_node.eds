@@ -404,7 +404,7 @@ SupportedObjects=1
 
 [2000]
 ParameterName=steering
-ObjectType=0x8
+ObjectType=0x9
 SubNumber=3
 
 [2000sub0]

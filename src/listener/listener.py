@@ -17,4 +17,3 @@ class Listener(ABC):
     @abstractmethod
     def inform_interpreter(self):
         pass
-

@@ -1,6 +1,7 @@
 selected_config: canopen_vcan
 
 canopen_example:
+    communication_protocol: canopen
     bustype: socketcan
     channel: can0
     bitrate: 500000
@@ -35,6 +36,7 @@ canopen_steering:
     }
 
 canopen_vcan:
+    communication_protocol: canopen
     bustype: socketcan
     channel: vcan0
     bitrate: 500000
@@ -51,6 +53,7 @@ canopen_vcan:
     }
 
 canopen_serial:
+    communication_protocol: canopen
     bustype: slcan
     channel: /dev/ttyACM0
     bitrate: 500000

@@ -99,7 +99,9 @@ def update_vehicle_status(node_id, var_name, new_value):
     for node in uncompressed_nodes:
         if(node['id'] == node_id):
             for variable in node['variables']:
-                if(variable['node_var_name'].replace(' ', '_') == var_name):
+                if(variable['node_var_name'].replace(' ', '_') == var_name
+                   and (variable['access_type'] == 'rw' or
+                        variable['access_type'] == 'wo')):
                     index = ast.literal_eval(variable['index'])
                     sub_index = ast.literal_eval(variable['sub_index'])
                     if(node['name'] == variable['node_name']):

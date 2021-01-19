@@ -123,7 +123,8 @@ class CanOpenListener(Listener):
                                            sdo_value)):
                     self.inform_interpreter(
                         sdo_value, sdo_client[sdo_index][subindex].od.name,
-                        sdo_data_type, node_id, hex(sdo_index), hex(subindex))
+                        sdo_data_type, node_id, hex(sdo_index), hex(subindex),
+                        sdo_client[sdo_index][subindex].od.access_type)
 
     def _read_simple_variable(self, sdo_client, sdo_index, node_id):
         sdo_value = sdo_client.upload(sdo_index, 0)
@@ -131,7 +132,8 @@ class CanOpenListener(Listener):
         if(self._sdo_value_changed(sdo_index, node_id, sdo_value)):
             self.inform_interpreter(sdo_value, sdo_client[sdo_index].od.name,
                                     sdo_data_type, node_id, hex(sdo_index),
-                                    hex(0))
+                                    hex(0),
+                                    sdo_client[sdo_index].od.access_type)
 
     def _add_nodes(self, nodes):
         for i in range(len(nodes)):
@@ -148,7 +150,7 @@ class CanOpenListener(Listener):
                                       nodes[i]['eds_location'])
 
     def inform_interpreter(self, sdo_value, sdo_name, sdo_data_type, node_id,
-                           index, sub_index):
+                           index, sub_index, access_type):
         ''' Informs the interpreter with a changed SDO.
 
             sdo_value : any
@@ -169,6 +171,9 @@ class CanOpenListener(Listener):
 
             sub_index : string
                 Sub-index of the variable.
+            
+            access_type : string
+                Access-type of the variable.
 
             Returns void.
         '''
@@ -176,7 +181,7 @@ class CanOpenListener(Listener):
         node = [x for x in self.nodes if x['id'] == node_id][0]
         self.interpreter.inform_interpreter(sdo_value, sdo_name,
                                             sdo_data_type, node, index,
-                                            sub_index)
+                                            sub_index, access_type)
 
     def set_interpreter(self, interpreter):
         ''' Set the interpreter where CanOpenListener can send messages to.

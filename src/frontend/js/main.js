@@ -64,7 +64,7 @@ const createAccordion = (parent) => {
     return accordion;
 }
 
-const createAccordionItem = (parent, id, title, table, type) => {
+const createAccordionItem = (parent, id, title, table, type, access_type) => {
     // Creates a tab for the accordion
     const item = createElement('div', ['class', 'accordion-item']);
     const header = createElement('h2', ['class', 'accordion-header']);
@@ -78,14 +78,16 @@ const createAccordionItem = (parent, id, title, table, type) => {
 
     const collapseContainer = createElement('div', ['id', 'collapse-' + id], ['class','accordion-collapse collapse']);
     const accordionBody = createElement('div', ['class', 'accordion-body']);
-    
-    if(type === 'SteeringNode') {
-        const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
-        accordionBody.appendChild(updateInput);
-        createElementWithText(accordionBody, 'degrees', 'label', ['class', 'mx-3']);
-    } else {
-        const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
-        accordionBody.appendChild(updateInput);
+    if(access_type != 'ro') {
+        createElementWithText(accordionBody, 'Update value: ', 'label', ['class', 'mx-3']);
+        if(type === 'SteeringNode') {
+            const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
+            accordionBody.appendChild(updateInput);
+            createElementWithText(accordionBody, 'degrees', 'label', ['class', 'mx-3']);
+        } else {
+            const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
+            accordionBody.appendChild(updateInput);
+        }
     }
 
     accordionBody.appendChild(table);
@@ -151,7 +153,6 @@ const updateGraph = () => {
 };
 
 const updateServoValue = (e) => {
-    console.log('test');
     const id = e.target.id.replace('update-', 'input-');
     const splittedId = id.split('-');
     const nodeId = splittedId[1];
@@ -249,7 +250,7 @@ getAllNodes().then(response => {
         createTable(node, node.name, div);
         createElementWithText(div, 'Variables', 'h4', ['class', 'node-title my-1']);
         
-        const updateButton = createElementWithText(div, 'Update Variable Values', 'button', 
+        const updateButton = createElementWithText(div, 'Update Node\'s Variable Values', 'button', 
         ['id', 'update-'+ node.id], 
         ['type','button'], ['class','btn btn-primary mx-2 my-2']);
 
@@ -257,7 +258,8 @@ getAllNodes().then(response => {
         for(const variable of node.variables) {
 
             const table = createTable(variable, variable.node_var_name);
-            createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), variable.node_var_name, table, node.type);
+            createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), 
+                                variable.node_var_name, table, node.type, variable.access_type);
             // Creates a unique list inside the varValues object
             // This list can be retrieved to make graphs.
             varValues[createIdSafeString(variable.node_name, variable.node_var_name)] = [];

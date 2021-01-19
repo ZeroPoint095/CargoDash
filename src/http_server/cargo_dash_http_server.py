@@ -48,7 +48,8 @@ def uncompress_nodes_information():
     except FileNotFoundError:
         return uncompress_nodes_information()
     all_nodes = zl.decompress(shared_dict[0]).decode('UTF-8')
-    all_nodes = '"'.join(all_nodes.split("'"))
+    all_nodes = '"'.join(all_nodes.split("'")).replace(
+        'False', 'false').replace('True', 'true')
     nodes_as_json = json.loads(all_nodes)
     return nodes_as_json
 
@@ -94,17 +95,24 @@ def update_vehicle_status(node_id, var_name, new_value):
     '''
     global all_saved_nodes
     global network
-
     uncompressed_nodes = uncompress_nodes_information()
-    for variable in uncompressed_nodes[node_id]['variables']:
-        if(variable['node_var_name'].replace(' ', '_') == var_name):
-            index = ast.literal_eval(variable['index'])
-            sub_index = ast.literal_eval(variable['sub_index'])
-            # do something for id
-            for node in all_saved_nodes:
-                if(node['name'] == variable['node_name']):
-                    network[node['id']].sdo[index][sub_index].phys = new_value
-                    network.sync.transmit()
+    for node in uncompressed_nodes:
+        if(node['id'] == node_id):
+            for variable in node['variables']:
+                if(variable['node_var_name'].replace(' ', '_') == var_name):
+                    index = ast.literal_eval(variable['index'])
+                    sub_index = ast.literal_eval(variable['sub_index'])
+                    if(node['name'] == variable['node_name']):
+                        # do something for id
+                        for kept_node in all_saved_nodes:
+                            if(kept_node['name'] == variable['node_name']):
+                                if(sub_index != 0):
+                                    network[kept_node['id']].sdo[
+                                        index][sub_index].phys = new_value
+                                else:
+                                    network[kept_node['id']].sdo[
+                                        index].phys = new_value
+                                network.sync.transmit()
 # End: Can-related functionalities
 
 

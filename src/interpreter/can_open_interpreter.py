@@ -62,10 +62,8 @@ class CanOpenInterpreter(Interpreter):
                 value, name, node_name, index=index,
                 sub_index=sub_index, data_type=sdo_data_type)
         elif(NodeType.EngineNode == node_type):
-            value_to_bool = True if (
-                unpack(unpack_format, value)[0]) == 1 else False
             n_input = self.node_input_factory.create_engine_node_input(
-                value_to_bool, name, node_name, index=index,
+                unpack(unpack_format, value)[0], name, node_name, index=index,
                 sub_index=sub_index)
         else:
             n_input = self.node_input_factory.create_temperature_node_input(
@@ -76,7 +74,7 @@ class CanOpenInterpreter(Interpreter):
     def _get_unpack_format(self, can_open_data_type):
         result = ''
 
-        data_types = {'0x1': 'c', '0x2': 'b', '0x3': 'h', '0x4': 'i',
+        data_types = {'0x1': 'b', '0x2': 'b', '0x3': 'h', '0x4': 'i',
                       '0x15': 'q', '0x5': 'B', '0x6': 'H', '0x7': 'I',
                       '0x1B': 'Q', '0x8': 'f', '0x11': 'd'}
         try:

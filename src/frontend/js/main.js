@@ -1,5 +1,7 @@
 import { getAllNodes, getNode, getVariable, updateVariable, getLoggingBuffer } from './CargoDashService.js';
 
+// MainController
+
 // Start: Helper methods
 
 let stopUpdating = false;
@@ -149,6 +151,7 @@ const updateGraph = () => {
 };
 
 const updateServoValue = (e) => {
+    console.log('test');
     const id = e.target.id.replace('update-', 'input-');
     const splittedId = id.split('-');
     const nodeId = splittedId[1];
@@ -160,7 +163,7 @@ const updateServoValue = (e) => {
                 try {
                     const value = parseInt(document.getElementById(varDocId).value);
                     if(!isNaN(value)) {
-                        console.log(value);
+                        console.log(nodeId, varName, value);
                         updateVariable(nodeId, varName, value);
                     }
                 } catch (err) {
@@ -223,9 +226,10 @@ getAllNodes().then(response => {
     const section = document.getElementById('section');
     const nav = document.getElementById('nav');
     const row = createElement('div', ['class', 'row justify-content-center']);
-    for(let node of response) {
-        createElementWithText(section, 'Stop Updating Graphs', 'button', ['id', 'updateGraphButton'] , ['type','button'], 
+    createElementWithText(section, 'Stop Updating Graphs', 'button', ['id', 'updateGraphButton'] , ['type','button'], 
             ['class','btn btn-danger mx-3 mt-3']);
+    section.appendChild(row);
+    for(let node of response) {
         // Initialises Graphs
         for(const variable of node.variables) {
             let variableDiv = createElement('div', ['class', 'col-4 m-5',], ['style','background-color:white;']);
@@ -237,7 +241,6 @@ getAllNodes().then(response => {
 
             row.appendChild(variableDiv);
         }
-        section.appendChild(row);
 
         // Initialises Detailed Tables
         let div = createDivWithHeader(section, node.name + ' | ' + node.type, node.name);
@@ -259,9 +262,9 @@ getAllNodes().then(response => {
             // This list can be retrieved to make graphs.
             varValues[createIdSafeString(variable.node_name, variable.node_var_name)] = [];
         }
-        document.getElementById('updateGraphButton').addEventListener('click', updateGraph, false);
         updateButton.addEventListener('click', updateServoValue, false);
     }
+    document.getElementById('updateGraphButton').addEventListener('click', updateGraph, false);
 });
 
 // Graphs updates every second

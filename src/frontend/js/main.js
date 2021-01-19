@@ -204,6 +204,15 @@ const updateNodeVariableValues = () => {
                         // Check if graph initialized
                         if(varGraphs[createIdSafeString(variable.node_name, variable.node_var_name)] == undefined) {
                             // initializes graph
+                            const row = document.getElementById('row-w-graphs');
+                            let variableDiv = createElement('div', ['class', 'col-4 m-5',], ['style','background-color:white;']);
+                            createElementWithText(variableDiv, node.name + ' | ' + variable.node_var_name, 'h6',['class', 'm-2']);
+                            const graph = createElement('div', ['id','div_g-'+ createIdSafeString(variable.node_name, variable.node_var_name)],
+                                            ['style','width:initial;']);
+                            variableDiv.appendChild(graph);
+
+                            row.appendChild(variableDiv);
+                            
                             varGraphs[createIdSafeString(variable.node_name, variable.node_var_name)] = 
                             new Dygraph(document.getElementById('div_g-' + createIdSafeString(variable.node_name, variable.node_var_name)),
                             varValues[createIdSafeString(variable.node_name, variable.node_var_name)], {
@@ -230,22 +239,11 @@ getAllNodes().then(response => {
     allNodes = response;
     const section = document.getElementById('section');
     const nav = document.getElementById('nav');
-    const row = createElement('div', ['class', 'row justify-content-center']);
+    const row = createElement('div', ['id', 'row-w-graphs'], ['class', 'row justify-content-center']);
     createElementWithText(section, 'Stop Updating Graphs', 'button', ['id', 'updateGraphButton'] , ['type','button'], 
             ['class','btn btn-danger mx-3 mt-3']);
     section.appendChild(row);
     for(let node of response) {
-        // Initialises Graphs
-        for(const variable of node.variables) {
-            let variableDiv = createElement('div', ['class', 'col-4 m-5',], ['style','background-color:white;']);
-            createElementWithText(variableDiv, node.name + ' | ' + variable.node_var_name, 'h6',['class', 'm-2']);
-            
-            const graph = createElement('div', ['id','div_g-'+ createIdSafeString(variable.node_name, variable.node_var_name)],
-                                        ['style','width:initial;']);
-            variableDiv.appendChild(graph);
-
-            row.appendChild(variableDiv);
-        }
 
         // Initialises Detailed Tables
         let div = createDivWithHeader(section, node.name + ' | ' + node.type, node.name);

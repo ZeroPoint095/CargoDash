@@ -101,7 +101,7 @@ const createAccordionItem = (parent, id, title, table, type, access_type, parent
     parent.appendChild(item);
 }
 
-const createTable = (object, objectName = '', parent = null) => {
+const createTable = (object, isNode, objectName = '', parent = null) => {
     // Creates Table that has information of node/variable
     const table = createElement('table', ['class', 'table']);
     
@@ -116,7 +116,7 @@ const createTable = (object, objectName = '', parent = null) => {
     const tbody = document.createElement('tbody');
     let index = 1;
     for(const [key, value] of Object.entries(object)) {
-        if (key !== 'variables') {
+        if (key !== 'variables' && (!isNode || (key === 'id' || key === 'type' || key === 'name'))) {
             const tr = document.createElement('tr');
             tr.appendChild(createElementWithText(null, index.toString(), 'th', ['scope', 'row']));
             tr.appendChild(createElementWithText(null, key, 'td'));
@@ -249,7 +249,7 @@ getAllNodes().then(response => {
         let div = createDivWithHeader(section, node.name + ' | ' + node.type, node.name);
         addNavbarLink(nav, node.name);
         // node table
-        createTable(node, node.name, div);
+        createTable(node, true, node.name, div);
         createElementWithText(div, 'Variables', 'h4', ['class', 'node-title my-1']);
         
         const updateButton = createElementWithText(div, 'Update Node\'s Variable Values', 'button', 
@@ -259,7 +259,7 @@ getAllNodes().then(response => {
         const accordion = createAccordion(div);
         for(const variable of node.variables) {
 
-            const table = createTable(variable, variable.node_var_name);
+            const table = createTable(variable, false, variable.node_var_name);
             if(variable.parent_name != undefined) {
                 createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), 
                                     variable.node_var_name, table, node.type, variable.access_type, variable.parent_name);

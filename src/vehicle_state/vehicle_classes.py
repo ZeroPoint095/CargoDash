@@ -51,6 +51,8 @@ class Node(ABC):
                 updated = True
                 variable['value'] = var_dict['value']
         if(not updated):
+            if(var_dict['parent_name'] is None):
+                var_dict.pop('parent_name')
             self.variables = np.append(self.variables, var_dict)
 
 

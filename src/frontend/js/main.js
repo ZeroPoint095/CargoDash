@@ -64,15 +64,19 @@ const createAccordion = (parent) => {
     return accordion;
 }
 
-const createAccordionItem = (parent, id, title, table, type, access_type) => {
+const createAccordionItem = (parent, id, title, table, type, access_type, parent_name = null) => {
     // Creates a tab for the accordion
     const item = createElement('div', ['class', 'accordion-item']);
     const header = createElement('h2', ['class', 'accordion-header']);
     const button = createElement('button', ['class', 'accordion-button'], 
         ['type', 'button'], ['data-bs-toggle', 'collapse'], ['data-bs-target', '#collapse-' + id]
         ,['aria-expanded','true'], ['aria-controls', 'collapse-' + id], ['id', 'id-' + id]);
-    
-    const text = document.createTextNode(title);
+    let text;
+    if(parent_name == null) {
+        text = document.createTextNode(title);
+    } else {
+        text = document.createTextNode(parent_name + ' - ' + title);
+    }
     button.appendChild(text);
     header.appendChild(button);
 
@@ -258,8 +262,13 @@ getAllNodes().then(response => {
         for(const variable of node.variables) {
 
             const table = createTable(variable, variable.node_var_name);
-            createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), 
-                                variable.node_var_name, table, node.type, variable.access_type);
+            if(variable.parent_name != undefined) {
+                createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), 
+                                    variable.node_var_name, table, node.type, variable.access_type, variable.parent_name);
+            } else {
+                createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), 
+                                    variable.node_var_name, table, node.type, variable.access_type);
+            }
             // Creates a unique list inside the varValues object
             // This list can be retrieved to make graphs.
             varValues[createIdSafeString(variable.node_name, variable.node_var_name)] = [];

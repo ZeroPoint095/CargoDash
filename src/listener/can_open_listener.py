@@ -124,7 +124,8 @@ class CanOpenListener(Listener):
                     self.inform_interpreter(
                         sdo_value, sdo_client[sdo_index][subindex].od.name,
                         sdo_data_type, node_id, hex(sdo_index), hex(subindex),
-                        sdo_client[sdo_index][subindex].od.access_type)
+                        sdo_client[sdo_index][subindex].od.access_type,
+                        sdo_client[sdo_index].od.name)
 
     def _read_simple_variable(self, sdo_client, sdo_index, node_id):
         sdo_value = sdo_client.upload(sdo_index, 0)
@@ -150,7 +151,7 @@ class CanOpenListener(Listener):
                                       nodes[i]['eds_location'])
 
     def inform_interpreter(self, sdo_value, sdo_name, sdo_data_type, node_id,
-                           index, sub_index, access_type):
+                           index, sub_index, access_type, parent_name=None):
         ''' Informs the interpreter with a changed SDO.
 
             sdo_value : any
@@ -171,9 +172,12 @@ class CanOpenListener(Listener):
 
             sub_index : string
                 Sub-index of the variable.
-            
+
             access_type : string
                 Access-type of the variable.
+
+            parent_name : string
+                The name of the array or record.
 
             Returns void.
         '''
@@ -181,7 +185,8 @@ class CanOpenListener(Listener):
         node = [x for x in self.nodes if x['id'] == node_id][0]
         self.interpreter.inform_interpreter(sdo_value, sdo_name,
                                             sdo_data_type, node, index,
-                                            sub_index, access_type)
+                                            sub_index, access_type,
+                                            parent_name)
 
     def set_interpreter(self, interpreter):
         ''' Set the interpreter where CanOpenListener can send messages to.

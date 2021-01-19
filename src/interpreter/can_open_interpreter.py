@@ -11,7 +11,8 @@ class CanOpenInterpreter(Interpreter):
         super().__init__()
 
     def inform_interpreter(self, sdo_value, sdo_name, sdo_data_type,
-                           node_properties, index, sub_index, access_type):
+                           node_properties, index, sub_index, access_type,
+                           parent_name):
         ''' This method is requested by the CanOpenListener when it notices
             changes at a certain sdo value.
 
@@ -38,6 +39,9 @@ class CanOpenInterpreter(Interpreter):
             access_type : string
                 access-type of the variable.
 
+            parent_name : string
+                The name of the array or record.
+
             Returns void.
         '''
         self._interpret_object(sdo_value, sdo_name,
@@ -45,10 +49,12 @@ class CanOpenInterpreter(Interpreter):
                                node_properties['name'],
                                node_properties['type'],
                                index, sub_index,
-                               access_type)
+                               access_type,
+                               parent_name)
 
     def _interpret_object(self, value, name, sdo_data_type, node_name,
-                          node_type_index, index, sub_index, access_type):
+                          node_type_index, index, sub_index, access_type,
+                          parent_name):
         node_type = NodeType(node_type_index)
         unpack_format = self._get_unpack_format(sdo_data_type)
         # Checks every possible node
@@ -57,27 +63,27 @@ class CanOpenInterpreter(Interpreter):
             n_input = self.node_input_factory.create_distance_node_input(
                 unpack(unpack_format, value)[0], name, node_name, index=index,
                 sub_index=sub_index, data_type=sdo_data_type,
-                access_type=access_type)
+                access_type=access_type, parent_name=parent_name)
         elif(NodeType.SteeringNode == node_type):
             n_input = self.node_input_factory.create_steering_node_input(
                 unpack(unpack_format, value)[0], name, node_name, index=index,
                 sub_index=sub_index, data_type=sdo_data_type,
-                access_type=access_type)
+                access_type=access_type, parent_name=parent_name)
         elif(NodeType.LocalizationNode == node_type):
             n_input = self.node_input_factory.create_localization_node_input(
                 value, name, node_name, index=index,
                 sub_index=sub_index, data_type=sdo_data_type,
-                access_type=access_type)
+                access_type=access_type, parent_name=parent_name)
         elif(NodeType.EngineNode == node_type):
             n_input = self.node_input_factory.create_engine_node_input(
                 unpack(unpack_format, value)[0], name, node_name, index=index,
                 sub_index=sub_index, data_type=sdo_data_type,
-                access_type=access_type)
+                access_type=access_type, parent_name=parent_name)
         else:
             n_input = self.node_input_factory.create_temperature_node_input(
                 unpack(unpack_format, value)[0], name, node_name, index=index,
                 sub_index=sub_index, data_type=sdo_data_type,
-                access_type=access_type)
+                access_type=access_type, parent_name=parent_name)
         self.vehicle.edit_vehicle_state(n_input)
 
     def _get_unpack_format(self, can_open_data_type):

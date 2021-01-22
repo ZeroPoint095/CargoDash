@@ -7,13 +7,21 @@ class Listener(ABC):
         super().__init__()
 
     @abstractmethod
-    def connect_to_network(self, channel):
+    def connect_to_network(self):
         pass
 
     @abstractmethod
-    def listen_to_network(self):
+    def listen_to_network(self, nodes):
         pass
 
     @abstractmethod
-    def inform_interpreter(self):
+    def async_network_loop(self):
+        pass
+
+    @abstractmethod
+    def inform_interpreter(self, node_data):
+        pass
+
+    @abstractmethod
+    def set_interpreter(self, interpreter):
         pass

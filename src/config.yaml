@@ -1,4 +1,4 @@
-selected_config: canopen_vcan
+selected_config: canopen_smarterdam
 
 canopen_example:
     communication_protocol: canopen

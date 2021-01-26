@@ -110,7 +110,7 @@ Inside the code block below you can read a detailed description of which configu
 ```
 ## Extending CargoDash Communication Possibilities
 
-For now, CargoDash is only able to work with the CanOpen protocol but it has the potential to work with more communication protocols. If you want to add a communication protocol then you should add a new interpreter and a new listener. You can easily create a new listener class that uses the same methods and interfaces as the abstract listener class. The same goes for the interpreter. The interfaces needs to be the same to keep consistency but the implementation needs to be different. It's important that you create nodes from the NodeFactory inside your interpreter. The NodeFactory class creates 'Node Input' objects which can be used to change the vehicle's state. In the diagram below you can have an understanding of CargoDash internal class interaction works.
+For now, CargoDash is only able to work with the CanOpen protocol but it has the potential to work with more communication protocols. If you want to add a communication protocol then you should add a new interpreter and a new listener. You can easily create a new listener class that uses the same methods and interfaces as the abstract listener class. The same goes for the interpreter. The public methods needs to use the same arguments as it's abstract class. It's important that you create nodes from the NodeFactory inside your interpreter. The NodeFactory class creates 'Node Input' objects which can be used to change the vehicle's state. In the diagram below you can have an understanding of CargoDash internal class interaction works.
 
 
 ![CargoDash Architecture](img/api_cargodash_v9.png "CargoDash Architecture")

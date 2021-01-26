@@ -200,7 +200,7 @@ async def get_variable(request):
     if(node_id >= 0 and node_id < len(all_nodes)):
         found = False
         for variable in all_nodes[node_id]['variables']:
-            if(variable['node_var_name'] == var_name):
+            if(variable['node_var_name'] == var_name.replace('_', ' ')):
                 found = True
                 return set_headers(web.json_response(variable))
         if(not found):

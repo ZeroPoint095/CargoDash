@@ -184,12 +184,16 @@ class ConfigureableVehicle(Vehicle):
                 for node in node_list:
                     if(type(node.variables) != list):
                         node.variables = node.variables.tolist()
+                    node.id = self.http_index
                     dict_list = np.append(dict_list, node.__dict__)
+                    self.http_index = self.http_index + 1
             else:
                 if(type(node_list.variables) != list):
                     node_list.variables = node_list.variables.tolist()
+                node_list.id = self.http_index
                 dict_list = np.append(dict_list, node_list.__dict__)
-
+                self.http_index = self.http_index + 1
+        self.http_index = 0
         # Compresses the data
         return zl.compress(str(dict_list.tolist()).encode('UTF-8'), 2)
 
@@ -203,7 +207,6 @@ class ConfigureableVehicle(Vehicle):
             if(not self._is_node_existing(self.distance_nodes,
                                           node_name)):
                 new_node = DistanceSensor(node_name)
-                new_node.id = self.http_index
                 new_node.type = node_type.name
                 self.distance_nodes = np.append(
                     self.distance_nodes, new_node)
@@ -212,7 +215,6 @@ class ConfigureableVehicle(Vehicle):
             # expect multiple steering nodes in general.
             if(self.steering is None):
                 self.steering = Steering(node_name)
-                self.steering.id = self.http_index
                 self.steering.type = node_type.name
         elif(node_type == NodeType.LocalizationNode):
             # TODO: add LocalizationNode for now less relevant
@@ -221,14 +223,12 @@ class ConfigureableVehicle(Vehicle):
             if(not self._is_node_existing(self.engine_nodes,
                                           node_name)):
                 new_node = Engine(node_name)
-                new_node.id = self.http_index
                 new_node.type = node_type.name
                 self.engine_nodes = np.append(
                     self.engine_nodes, new_node)
         elif(node_type == NodeType.TemperatureNode):
             # TODO: add TemperatureNode for now less relevant
             pass
-        self.http_index = self.http_index + 1
 
     def _get_node(self, node_list, node_input):
         for node in node_list:

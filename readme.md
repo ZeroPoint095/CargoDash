@@ -19,17 +19,30 @@ This document will help you to understand how to make use of CargoDash. CargoDas
 ```
     pip3 install -r requirements.txt
 ```
-&nbsp;&nbsp;&nbsp;3a. Run startup.sh to use CargoDash without 'mocked' slave nodes
+&nbsp;&nbsp;&nbsp;3a. Run startup-smarterdam.sh to run the Smarterdam vehicle.
 ```
     ./startup-run_prod.sh
 ```
-&nbsp;&nbsp;&nbsp;3b. Run startup.sh to use CargoDash with mocked slave nodes
+&nbsp;&nbsp;&nbsp;3b. To run the CargoDash API manually you need to run 3 separate terminals:
+
+Terminal 1:
 ```
-    ./startup-test_environment.sh
+    python3 src/main.py
+```
+Terminal 2:
+```
+    python3 src/http_server/cargo_dash_http_server.py
+```  
+Terminal 3:
+```
+    cd src/frontend
+    python3 -m http.server
 ```  
 
+
+
 ## Introduction
-CargoDash is a tool that listens to incoming messages and sets the values of these messages into user-defined nodes. These user-defined nodes can be requested with CargoDash's HTTP-server. Besides this, it logs all raw incoming messages into a buffered logger. 
+CargoDash is a tool that listens to incoming messages and sets the values of these messages into user-defined nodes. These user-defined nodes can be requested with CargoDash's HTTP-server. The tool can also be used to update these user-defined nodes with new values. Besides this, it logs all raw incoming messages into a buffered logger. 
 
 For now, CargoDash works only with CanOpen messages but with the architecture of CargoDash, you should be able to add your desired message protocol.
 
@@ -97,10 +110,10 @@ Inside the code block below you can read a detailed description of which configu
 ```
 ## Extending CargoDash Communication Possibilities
 
-For now, CargoDash is only able to work with the CanOpen protocol but it has the potential to work with more communication protocols. If you want to add a communication protocol then you should add a new interpreter and a new listener. You can easily create a new listener class that uses the same methods as the abstract listener class. The same goes for the interpreter. It's important that you create nodes from the NodeFactory inside your interpreter. The NodeFactory class creates 'Node Input' objects which can be used to change the vehicle's state. In the diagram below you can have an understanding of CargoDash internal class interaction works.
+For now, CargoDash is only able to work with the CanOpen protocol but it has the potential to work with more communication protocols. If you want to add a communication protocol then you should add a new interpreter and a new listener. You can easily create a new listener class that uses the same methods and interfaces as the abstract listener class. The same goes for the interpreter. The interfaces needs to be the same to keep consistency but the implementation needs to be different. It's important that you create nodes from the NodeFactory inside your interpreter. The NodeFactory class creates 'Node Input' objects which can be used to change the vehicle's state. In the diagram below you can have an understanding of CargoDash internal class interaction works.
 
 
-![CargoDash Architecture](img/api_cargodash_v8.png "CargoDash Architecture")
+![CargoDash Architecture](img/api_cargodash_v9.png "CargoDash Architecture")
 
 ## Adding Nodes
 In CargoDash we already implemented certain standard nodes that would exist in a real vehicle such as SteeringNode, TemperatureNode, and more. But if you want to add your own, custom node you can add it by changing some files. You can do this using the changes described below using a LidarNode as an example.
@@ -120,7 +133,8 @@ At the end of the file add the new class *LidarNodeInput*.
     ...
     class LidarNodeInput(NodeInput):
     # Enum 5
-    def __init__(self, distance: float, name: str, node_name: str):
+    def __init__(self, distance: float, name: str, node_name: str,
+                 **additional_attributes):
         super().__init__(distance, name, node_name)
 
 ```
@@ -131,21 +145,29 @@ Inside the class *NodeInputFactory* add a new method.
 
     ...
     def create_lidar_node_input(self, distance: float,
-                                   name: str, node_name: str):
+                                name: str, node_name: str, 
+                                **additional_attributes):
         return LidarNodeInput(distance,
                               name, node_name)
 ```
 And don't forget to import *LidarNodeInput* at the *node_input_factory.py* file.
 
 In class *CanOpenInterpreter* you need to add the node check between the last elif and else.
-You should make it similar like this.
+You should make it similar like this. It is really depending on which extra attributes you want to give as well.
+The obligatory attributes are the new value, the name of the variable and the name of node. 
 ```python
     # Change in: interpreter/can_open_interpreter.py
 
     ...
     elif(NodeType.LidarNode == node_type):
         n_input = self.node_input_factory.create_lidar_node_input(
-            unpack('h', value)[0], name, node_name)
+            unpack(unpack_format, node_data['sdo_value'])[0],
+            node_data['sdo_name'], node_data['node_name'],
+            index=node_data['index'],
+            sub_index=node_data['sub_index'],
+            data_type=node_data['sdo_data_type'],
+            access_type=node_data['access_type'],
+            parent_name=node_data['parent_name'])
     ...
 ```
 
@@ -155,6 +177,8 @@ In the constructor of class *ConfigureableVehicle* inside the file *vehicle_clas
 
     self.lidar_nodes = array([])
 ```
+So that all the lidar nodes can be kept in array so we can request for them whenever we need it.
+
 At the end of the file you should add:
 ```python
     # Add to: vehicle_state/vehicle_classes.py
@@ -165,9 +189,8 @@ At the end of the file you should add:
             self.distance = 0
             super().__init__(name)
 
-        def set_distance(self, distance):
-            self.distance = distance
 ```
+
 Then in private method *_add_node_to_vehicle* add:
 ```python
     # Add to: vehicle_state/vehicle_classes.py
@@ -189,11 +212,17 @@ Lastly you should add in method *edit_vehicle_state*:
     elif(input_type == LidarNodeInput):
         node = self._get_node(self.lidar_nodes, node_input)
         if(node is not None):
-            node.set_distance(node_input.value)
+            node.update_variable_list(node_input.node_var_name,
+                                      node_input.__dict__)
     ...
 ```
 
-## API
+The private method update_variable_list is the standard way to put new values into the nodes. 
+But inside the class LidarSensor you could create your own custom method that updates the values.
+
+According to your own business logic. 
+
+# CargoDash API Usage
 
 ### Retrieve all nodes
 ```http

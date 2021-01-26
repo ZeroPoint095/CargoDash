@@ -23,7 +23,7 @@ This document will help you to understand how to make use of CargoDash. CargoDas
 ```
     ./startup-run_prod.sh
 ```
-&nbsp;&nbsp;&nbsp;3b. To run the CargoDash API manually you need to run 3 separate terminals:
+&nbsp;&nbsp;&nbsp;3b. To run the CargoDash API manually you need to run the following in 3 separate terminals:
 
 Terminal 1:
 ```
@@ -331,4 +331,3 @@ Eg. returns
     }
 ]
 ```
-

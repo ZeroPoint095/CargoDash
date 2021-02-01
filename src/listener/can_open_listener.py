@@ -106,6 +106,14 @@ class CanOpenListener(Listener):
         except KeyboardInterrupt:
             pass
 
+    def _create_node_data_object(self, sdo_value, sdo_name, sdo_data_type,
+                                 node_id, index, sub_index, access_type,
+                                 parent_name=None):
+        return {'sdo_value': sdo_value, 'sdo_name': sdo_name,
+                'sdo_data_type': sdo_data_type, 'node_id': node_id,
+                'index': index, 'sub_index': sub_index,
+                'access_type': access_type, 'parent_name': parent_name}
+
     def _read_complex_variable(self, sdo_client, sdo_index, node_id):
         if(type(sdo_client[sdo_index]) == canopen.sdo.base.Array):
             subindexes_range = len(sdo_client[sdo_index]) + 1
@@ -121,17 +129,22 @@ class CanOpenListener(Listener):
                 # Checks for every subindex if value changed
                 if(self._sdo_value_changed(index_and_subindex, node_id,
                                            sdo_value)):
-                    self.inform_interpreter(
+                    node_data = self._create_node_data_object(
                         sdo_value, sdo_client[sdo_index][subindex].od.name,
-                        sdo_data_type, node_id, hex(sdo_index), hex(subindex))
+                        sdo_data_type, node_id, hex(sdo_index), hex(subindex),
+                        sdo_client[sdo_index][subindex].od.access_type,
+                        sdo_client[sdo_index].od.name)
+                    self.inform_interpreter(node_data)
 
     def _read_simple_variable(self, sdo_client, sdo_index, node_id):
         sdo_value = sdo_client.upload(sdo_index, 0)
         sdo_data_type = hex(sdo_client[sdo_index].od.data_type)
         if(self._sdo_value_changed(sdo_index, node_id, sdo_value)):
-            self.inform_interpreter(sdo_value, sdo_client[sdo_index].od.name,
-                                    sdo_data_type, node_id, hex(sdo_index),
-                                    hex(0))
+            node_data = self._create_node_data_object(
+                sdo_value, sdo_client[sdo_index].od.name, sdo_data_type,
+                node_id, hex(sdo_index), hex(0),
+                sdo_client[sdo_index].od.access_type)
+            self.inform_interpreter(node_data)
 
     def _add_nodes(self, nodes):
         for i in range(len(nodes)):
@@ -147,36 +160,21 @@ class CanOpenListener(Listener):
                 self.network.add_node(nodes[i]['node_properties']['id'],
                                       nodes[i]['eds_location'])
 
-    def inform_interpreter(self, sdo_value, sdo_name, sdo_data_type, node_id,
-                           index, sub_index):
+    def inform_interpreter(self, node_data):
         ''' Informs the interpreter with a changed SDO.
 
-            sdo_value : any
-                Sends out the changed value.
-
-            sdo_name : canopen.sdo.Variable
-                Sends out the changed SDO name.
-
-            sdo_data_type : str
-                Sends the data_type as string representing a
-                hexadecimal value.
-
-            node_id : integer
-                Used to read node purpose.
-
-            index : string
-                Index of the variable.
-
-            sub_index : string
-                Sub-index of the variable.
+            node_data:
+                Contains the current state information of a sensor/actuator
+                , it's addresses and naming.
 
             Returns void.
         '''
         # Iterates through self.nodes to find correct node with id.
-        node = [x for x in self.nodes if x['id'] == node_id][0]
-        self.interpreter.inform_interpreter(sdo_value, sdo_name,
-                                            sdo_data_type, node, index,
-                                            sub_index)
+        node_properties = [
+            x for x in self.nodes if x['id'] == node_data['node_id']][0]
+        node_data['node_name'] = node_properties['name']
+        node_data['node_type_index'] = node_properties['type']
+        self.interpreter.inform_interpreter(node_data)
 
     def set_interpreter(self, interpreter):
         ''' Set the interpreter where CanOpenListener can send messages to.

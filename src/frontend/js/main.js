@@ -1,5 +1,7 @@
 import { getAllNodes, getNode, getVariable, updateVariable, getLoggingBuffer } from './CargoDashService.js';
 
+// MainController
+
 // Start: Helper methods
 
 let stopUpdating = false;
@@ -62,28 +64,34 @@ const createAccordion = (parent) => {
     return accordion;
 }
 
-const createAccordionItem = (parent, id, title, table, type) => {
+const createAccordionItem = (parent, id, title, table, type, access_type, parent_name = null) => {
     // Creates a tab for the accordion
     const item = createElement('div', ['class', 'accordion-item']);
     const header = createElement('h2', ['class', 'accordion-header']);
     const button = createElement('button', ['class', 'accordion-button'], 
         ['type', 'button'], ['data-bs-toggle', 'collapse'], ['data-bs-target', '#collapse-' + id]
         ,['aria-expanded','true'], ['aria-controls', 'collapse-' + id], ['id', 'id-' + id]);
-    
-    const text = document.createTextNode(title);
+    let text;
+    if(parent_name == null) {
+        text = document.createTextNode(title);
+    } else {
+        text = document.createTextNode(parent_name + ' - ' + title);
+    }
     button.appendChild(text);
     header.appendChild(button);
 
     const collapseContainer = createElement('div', ['id', 'collapse-' + id], ['class','accordion-collapse collapse']);
     const accordionBody = createElement('div', ['class', 'accordion-body']);
-    
-    if(type === 'SteeringNode') {
-        const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
-        accordionBody.appendChild(updateInput);
-        createElementWithText(accordionBody, 'degrees', 'label', ['class', 'mx-3']);
-    } else {
-        const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
-        accordionBody.appendChild(updateInput);
+    if(access_type != 'ro') {
+        createElementWithText(accordionBody, 'Update value: ', 'label', ['class', 'mx-3']);
+        if(type === 'SteeringNode') {
+            const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
+            accordionBody.appendChild(updateInput);
+            createElementWithText(accordionBody, 'degrees', 'label', ['class', 'mx-3']);
+        } else {
+            const updateInput = createElement('input', ['type', 'number'], ['id', 'input-'+ id]);
+            accordionBody.appendChild(updateInput);
+        }
     }
 
     accordionBody.appendChild(table);
@@ -93,7 +101,7 @@ const createAccordionItem = (parent, id, title, table, type) => {
     parent.appendChild(item);
 }
 
-const createTable = (object, objectName = '', parent = null) => {
+const createTable = (object, isNode, objectName = '', parent = null) => {
     // Creates Table that has information of node/variable
     const table = createElement('table', ['class', 'table']);
     
@@ -108,7 +116,7 @@ const createTable = (object, objectName = '', parent = null) => {
     const tbody = document.createElement('tbody');
     let index = 1;
     for(const [key, value] of Object.entries(object)) {
-        if (key !== 'variables') {
+        if (key !== 'variables' && (!isNode || (key === 'id' || key === 'type' || key === 'name'))) {
             const tr = document.createElement('tr');
             tr.appendChild(createElementWithText(null, index.toString(), 'th', ['scope', 'row']));
             tr.appendChild(createElementWithText(null, key, 'td'));
@@ -160,7 +168,7 @@ const updateServoValue = (e) => {
                 try {
                     const value = parseInt(document.getElementById(varDocId).value);
                     if(!isNaN(value)) {
-                        console.log(value);
+                        console.log(nodeId, varName, value);
                         updateVariable(nodeId, varName, value);
                     }
                 } catch (err) {
@@ -196,6 +204,15 @@ const updateNodeVariableValues = () => {
                         // Check if graph initialized
                         if(varGraphs[createIdSafeString(variable.node_name, variable.node_var_name)] == undefined) {
                             // initializes graph
+                            const row = document.getElementById('row-w-graphs');
+                            let variableDiv = createElement('div', ['class', 'col-4 m-5',], ['style','background-color:white;']);
+                            createElementWithText(variableDiv, node.name + ' | ' + variable.node_var_name, 'h6',['class', 'm-2']);
+                            const graph = createElement('div', ['id','div_g-'+ createIdSafeString(variable.node_name, variable.node_var_name)],
+                                            ['style','width:initial;']);
+                            variableDiv.appendChild(graph);
+
+                            row.appendChild(variableDiv);
+                            
                             varGraphs[createIdSafeString(variable.node_name, variable.node_var_name)] = 
                             new Dygraph(document.getElementById('div_g-' + createIdSafeString(variable.node_name, variable.node_var_name)),
                             varValues[createIdSafeString(variable.node_name, variable.node_var_name)], {
@@ -222,46 +239,41 @@ getAllNodes().then(response => {
     allNodes = response;
     const section = document.getElementById('section');
     const nav = document.getElementById('nav');
-    const row = createElement('div', ['class', 'row justify-content-center']);
-    for(let node of response) {
-        createElementWithText(section, 'Stop Updating Graphs', 'button', ['id', 'updateGraphButton'] , ['type','button'], 
+    const row = createElement('div', ['id', 'row-w-graphs'], ['class', 'row justify-content-center']);
+    createElementWithText(section, 'Stop Updating Graphs', 'button', ['id', 'updateGraphButton'] , ['type','button'], 
             ['class','btn btn-danger mx-3 mt-3']);
-        // Initialises Graphs
-        for(const variable of node.variables) {
-            let variableDiv = createElement('div', ['class', 'col-4 m-5',], ['style','background-color:white;']);
-            createElementWithText(variableDiv, node.name + ' | ' + variable.node_var_name, 'h6',['class', 'm-2']);
-            
-            const graph = createElement('div', ['id','div_g-'+ createIdSafeString(variable.node_name, variable.node_var_name)],
-                                        ['style','width:initial;']);
-            variableDiv.appendChild(graph);
-
-            row.appendChild(variableDiv);
-        }
-        section.appendChild(row);
+    section.appendChild(row);
+    for(let node of response) {
 
         // Initialises Detailed Tables
         let div = createDivWithHeader(section, node.name + ' | ' + node.type, node.name);
         addNavbarLink(nav, node.name);
         // node table
-        createTable(node, node.name, div);
+        createTable(node, true, node.name, div);
         createElementWithText(div, 'Variables', 'h4', ['class', 'node-title my-1']);
         
-        const updateButton = createElementWithText(div, 'Update Variable Values', 'button', 
+        const updateButton = createElementWithText(div, 'Update Node\'s Variable Values', 'button', 
         ['id', 'update-'+ node.id], 
         ['type','button'], ['class','btn btn-primary mx-2 my-2']);
 
         const accordion = createAccordion(div);
         for(const variable of node.variables) {
 
-            const table = createTable(variable, variable.node_var_name);
-            createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), variable.node_var_name, table, node.type);
+            const table = createTable(variable, false, variable.node_var_name);
+            if(variable.parent_name != undefined) {
+                createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), 
+                                    variable.node_var_name, table, node.type, variable.access_type, variable.parent_name);
+            } else {
+                createAccordionItem(accordion, createIdSafeString(String(node.id), variable.node_var_name), 
+                                    variable.node_var_name, table, node.type, variable.access_type);
+            }
             // Creates a unique list inside the varValues object
             // This list can be retrieved to make graphs.
             varValues[createIdSafeString(variable.node_name, variable.node_var_name)] = [];
         }
-        document.getElementById('updateGraphButton').addEventListener('click', updateGraph, false);
         updateButton.addEventListener('click', updateServoValue, false);
     }
+    document.getElementById('updateGraphButton').addEventListener('click', updateGraph, false);
 });
 
 // Graphs updates every second

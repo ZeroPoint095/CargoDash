@@ -1,20 +1,20 @@
 [FileInfo]
-FileName=steering_node.eds
+FileName=motor_node.eds
 FileVersion=1
 FileRevision=1
 EDSVersion=4.0
-Description=
-CreationTime=03:58PM
-CreationDate=12-14-2020
+Description=Smarterdam motor node
+CreationTime=12:58AM
+CreationDate=01-13-2021
 CreatedBy=CANFestival
-ModificationTime=03:58PM
-ModificationDate=12-14-2020
+ModificationTime=12:58AM
+ModificationDate=01-13-2021
 ModifiedBy=CANFestival
 
 [DeviceInfo]
 VendorName=CANFestival
 VendorNumber=0x00000000
-ProductName=steering_node
+ProductName=motor_node
 ProductNumber=0x00000000
 RevisionNumber=0x00000000
 BaudRate_10=1
@@ -298,14 +298,14 @@ PDOMapping=0
 [1600]
 ParameterName=Receive PDO 1 Mapping
 ObjectType=0x8
-SubNumber=3
+SubNumber=5
 
 [1600sub0]
 ParameterName=Number of Entries
 ObjectType=0x7
 DataType=0x0005
 AccessType=rw
-DefaultValue=2
+DefaultValue=4
 PDOMapping=0
 
 [1600sub1]
@@ -313,11 +313,27 @@ ParameterName=PDO 1 Mapping for an application object 1
 ObjectType=0x7
 DataType=0x0007
 AccessType=rw
-DefaultValue=536871176
+DefaultValue=536871184
 PDOMapping=0
 
 [1600sub2]
 ParameterName=PDO 1 Mapping for an application object 2
+ObjectType=0x7
+DataType=0x0007
+AccessType=rw
+DefaultValue=536871440
+PDOMapping=0
+
+[1600sub3]
+ParameterName=PDO 1 Mapping for an application object 3
+ObjectType=0x7
+DataType=0x0007
+AccessType=rw
+DefaultValue=536936464
+PDOMapping=0
+
+[1600sub4]
+ParameterName=PDO 1 Mapping for an application object 4
 ObjectType=0x7
 DataType=0x0007
 AccessType=rw
@@ -380,14 +396,14 @@ PDOMapping=0
 [1A00]
 ParameterName=Transmit PDO 1 Mapping
 ObjectType=0x8
-SubNumber=2
+SubNumber=3
 
 [1A00sub0]
 ParameterName=Number of Entries
 ObjectType=0x7
 DataType=0x0005
 AccessType=rw
-DefaultValue=1
+DefaultValue=2
 PDOMapping=0
 
 [1A00sub1]
@@ -395,15 +411,26 @@ ParameterName=PDO 1 Mapping for a process data variable 1
 ObjectType=0x7
 DataType=0x0007
 AccessType=rw
-DefaultValue=0
+DefaultValue=537002248
+PDOMapping=0
+
+[1A00sub2]
+ParameterName=PDO 1 Mapping for a process data variable 2
+ObjectType=0x7
+DataType=0x0007
+AccessType=rw
+DefaultValue=537002504
 PDOMapping=0
 
 [ManufacturerObjects]
-SupportedObjects=1
+SupportedObjects=4
 1=0x2000
+2=0x2001
+3=0x2002
+4=0x2003
 
 [2000]
-ParameterName=steering
+ParameterName=motor
 ObjectType=0x9
 SubNumber=3
 
@@ -416,7 +443,7 @@ DefaultValue=2
 PDOMapping=0
 
 [2000sub1]
-ParameterName=servo left
+ParameterName=left wheel
 ObjectType=0x7
 DataType=0x0006
 AccessType=rw
@@ -424,9 +451,54 @@ DefaultValue=0
 PDOMapping=1
 
 [2000sub2]
-ParameterName=servo right
+ParameterName=right wheel
+ObjectType=0x7
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=1
+
+[2001]
+ParameterName=ebrake
+ObjectType=0x7
+DataType=0x0006
+AccessType=rw
+DefaultValue=0
+PDOMapping=1
+
+[2002]
+ParameterName=fake speedometer
+ObjectType=0x9
+SubNumber=3
+
+[2002sub0]
+ParameterName=Number of Entries
 ObjectType=0x7
 DataType=0x0005
+AccessType=ro
+DefaultValue=2
+PDOMapping=0
+
+[2002sub1]
+ParameterName=left
+ObjectType=0x7
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+PDOMapping=1
+
+[2002sub2]
+ParameterName=right
+ObjectType=0x7
+DataType=0x0005
+AccessType=rw
+DefaultValue=0
+PDOMapping=1
+
+[2003]
+ParameterName=reverse toggle
+ObjectType=0x7
+DataType=0x0001
 AccessType=rw
 DefaultValue=0
 PDOMapping=1

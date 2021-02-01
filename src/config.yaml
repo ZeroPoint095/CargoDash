@@ -35,13 +35,34 @@ canopen_steering:
 
     }
 
+canopen_smarterdam:
+    communication_protocol: canopen
+    bustype: socketcan
+    channel: can0
+    bitrate: 500000
+    nodes: [{local: false, eds_location: 'eds_files/steering_node.eds', node_properties: {id: 3,
+             name: 'Smarterdam Steering', type: 1}},
+            {local: false, eds_location: 'eds_files/motor_node.eds', node_properties: {id: 4,
+             name: 'Smarterdam Motor', type: 3}}]
+    max_speed_in_ms: 3
+    raw_can_data_logging: {
+        enabled: false,
+        # The value is the amount in raw can messages.
+        # Implementation saves raw can messages up until buffer's value. 
+        buffer: 1024,
+        # At every n-th message update shared memory
+        shm_update_interval_threshold: 100
+    }
+
 canopen_vcan:
     communication_protocol: canopen
     bustype: socketcan
     channel: vcan0
     bitrate: 500000
-    nodes: [{local: false, eds_location: 'eds_files/steering_node.eds', node_properties: {id: 5,
-        name: 'Smarterdam Steering', type: 1}}]
+    nodes: [{local: false, eds_location: 'eds_files/steering_node.eds', node_properties: {id: 3,
+             name: 'Smarterdam Steering', type: 1}},
+            {local: false, eds_location: 'eds_files/motor_node.eds', node_properties: {id: 4,
+             name: 'Smarterdam Motor', type: 3}}]
     max_speed_in_ms: 3
     raw_can_data_logging: {
         enabled: false,

@@ -6,5 +6,5 @@ class Interpreter(ABC):
         super().__init__()
 
     @abstractmethod
-    def inform_interpreter(object):
+    def inform_interpreter(self, node_data):
         pass

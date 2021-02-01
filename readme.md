@@ -19,11 +19,20 @@ This document will help you to understand how to make use of CargoDash. CargoDas
 ```
     pip3 install -r requirements.txt
 ```
-&nbsp;&nbsp;&nbsp;3a. Run startup-smarterdam.sh to run the Smarterdam vehicle.
+&nbsp;&nbsp;&nbsp;3a. For a *virtual* CANbus use the following command to initialise the CANbus:
 ```
-    ./startup-run_prod.sh
+sudo ip link add dev vcan0 type vcan
+sudo ip link set up vcan0
 ```
-&nbsp;&nbsp;&nbsp;3b. To run the CargoDash API manually you need to run the following in 3 separate terminals:
+
+&nbsp;&nbsp;&nbsp;3b. For a *real* CANbus use the following command:
+```
+sudo ip link set can0 up type can bitrate 500000
+sudo ifconfig can0 txqueuelen 20000
+```
+&nbsp;&nbsp;&nbsp;First time setting a *real* CANbus? See this [document](https://github.com/ZeroPoint095/CANFestivino/blob/master/INSTALLATION-GUIDE.md) first!
+
+4. To run the CargoDash API manually you need to run the following in 3 separate terminals:
 
 Terminal 1:
 ```

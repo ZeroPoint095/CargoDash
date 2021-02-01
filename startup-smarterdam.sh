@@ -1,4 +1,3 @@
-# It's empty for now we can fix this at the end.
 sudo ip link set can0 up type can bitrate 500000
 sudo ifconfig can0 txqueuelen 10000
 

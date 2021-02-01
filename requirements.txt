@@ -1,0 +1,6 @@
+aiohttp
+asyncio
+can
+canopen
+numpy
+pyyaml

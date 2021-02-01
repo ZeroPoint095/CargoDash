@@ -1,9 +1,15 @@
 import json
+import ast
+import canopen
+import logging
+import yaml
+import numpy as np
 import zlib as zl
 from aiohttp import web
 from multiprocessing import shared_memory
 
 routes = web.RouteTableDef()
+all_saved_nodes = np.array([])
 
 
 def set_headers(response):
@@ -45,6 +51,61 @@ def uncompress_nodes_information():
     all_nodes = '"'.join(all_nodes.split("'"))
     nodes_as_json = json.loads(all_nodes)
     return nodes_as_json
+
+
+# Start: Can-related functionalities
+def connect_to_network():
+    network = canopen.Network()
+    with open('../config.yaml', 'r') as ymlfile:
+        config = yaml.safe_load(ymlfile)
+    try:
+        selected_config = config['selected_config']
+        bustype = config[selected_config]['bustype']
+        channel = config[selected_config]['channel']
+        bitrate = config[selected_config]['bitrate']
+        network.connect(bustype=bustype, channel=channel, bitrate=bitrate)
+    except OSError:
+        logging.error('CanOpenListener is unable to listen to network,'
+                      ' please check if configuration is set properly!'
+                      f'(bustype = {bustype}, channel = {channel},'
+                      f' bitrate = {bitrate})')
+    network = add_nodes(network, config[selected_config]['nodes'])
+    return config, network
+
+
+def add_nodes(network, nodes):
+    global all_saved_nodes
+    for i in range(len(nodes)):
+        all_saved_nodes = np.append(all_saved_nodes, nodes[i]['node_properties'])
+        # Either adds local or remote node bases on config for each node
+        if(nodes[i]['local']):
+            # Create a local node
+            network.create_node(nodes[i]['node_properties']['id'],
+                                '../'+nodes[i]['eds_location'])
+        else:
+            # Add a remote node
+            network.add_node(nodes[i]['node_properties']['id'],
+                             '../'+nodes[i]['eds_location'])
+    return network
+
+
+def update_vehicle_status(node_id, var_name, new_value):
+    ''' Send a Can message to update the vehicle status.
+    '''
+    global all_saved_nodes
+    global network
+
+    uncompressed_nodes = uncompress_nodes_information()
+    for variable in uncompressed_nodes[node_id]['variables']:
+        if(variable['node_var_name'].replace(' ', '_') == var_name):
+            index = ast.literal_eval(variable['index'])
+            sub_index = ast.literal_eval(variable['sub_index'])
+            # do something for id
+            for node in all_saved_nodes:
+                if(node['name'] == variable['node_name']):
+                    network[node['id']].sdo[index][sub_index].phys = new_value
+                    network.sync.transmit()
+# End: Can-related functionalities
 
 
 @routes.get('/allnodes')
@@ -156,11 +217,29 @@ async def update_variable_value(request):
             }
 
         Note: This post request has lower importance for us. Hopefully we
-              are able to implement this.
+              are able to implement this fully.
 
     '''
-    # TODO: update values of variables
-    pass
+    try:
+        node_id = int(request.match_info['id'])
+        var_name = request.match_info['var_name']
+    except ValueError:
+        return set_headers(web.json_response(
+            {'message': 'Variable doesn\'t exist!'}))
+    if request.body_exists:
+        await_data = await request.read()
+        new_data = ast.literal_eval(await_data.decode('UTF-8'))
+        if(type(new_data['value']) is int):
+            new_integer = int(new_data['value'])
+            update_vehicle_status(node_id, var_name, new_integer)
+        else:
+            return set_headers(web.json_response({'message': 'Got unsupported \
+            datatype value! (only support integer for now)'}))
+        return set_headers(web.json_response({'message': 'Succesfully changed \
+            value!'}))
+    else:
+        return set_headers(web.json_response({'message': 'Haven\'t received \
+            a request body!'}))
 
 
 @routes.get('/getloggingbuffer')
@@ -183,6 +262,7 @@ async def get_logging_buffer(request):
 
     return set_headers(web.json_response(uncompress_logging_information()))
 
+config, network = connect_to_network()
 
 app = web.Application()
 app.add_routes(routes)

@@ -12,9 +12,9 @@ async def concurrently(master_node_loop, logger_loop):
 
 
 if __name__ == "__main__":
-    config_type = 'canopen_vcan'
     with open('./config.yaml', 'r') as ymlfile:
         config = yaml.safe_load(ymlfile)
+    config_type = config['selected_config']
     if(config[config_type]['communication_protocol'] == 'canopen'):
         TestNetwork = CanOpenTestNetwork(config, config_type)
 

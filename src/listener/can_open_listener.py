@@ -107,7 +107,11 @@ class CanOpenListener(Listener):
             pass
 
     def _read_complex_variable(self, sdo_client, sdo_index, node_id):
-        for subindex in range(len(sdo_client[sdo_index]) + 1):
+        if(type(sdo_client[sdo_index]) == canopen.sdo.base.Array):
+            subindexes_range = len(sdo_client[sdo_index]) + 1
+        else:
+            subindexes_range = len(sdo_client[sdo_index])
+        for subindex in range(subindexes_range):
             # Skips subindex 0 because there are no value changes around this
             if(subindex != 0):
                 index_and_subindex = f'{sdo_index}sub{subindex}'

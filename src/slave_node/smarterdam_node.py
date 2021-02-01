@@ -16,8 +16,8 @@ class SmarterdamSlaveNode:
         self.selected_config = self.config['selected_config']
         # local node
         self.connectToNetwork(canopen.Network())
-        self.network.create_node(5, '../eds_files/steering_node.eds')
-        self.network.create_node(1, '../eds_files/motor_node.eds')
+        self.network.create_node(3, '../eds_files/steering_node.eds')
+        self.network.create_node(4, '../eds_files/motor_node.eds')
         while True:
             sleep(1)
             self.network.sync.transmit()
